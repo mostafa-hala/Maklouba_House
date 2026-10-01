@@ -172,7 +172,13 @@ export default function App() {
       if (existing) {
         return prev.map(i => i.id === itemId ? {...i, quantity: i.quantity + 1} : i);
       }
-      return [...prev, { id: itemId, name: item.name, price: item.price, quantity: 1 }];
+      return [...prev, { 
+        id: itemId, 
+        name: item.name, 
+        price: item.price, 
+        quantity: 1,
+        minPickupTime: item.minPickupTime || 'ASAP'
+      }];
     });
     setIsCartOpen(true);
   };
@@ -501,8 +507,10 @@ export default function App() {
                           placeholder="Your Full Name"
                           value={orderFormData.fullName}
                           onChange={(e) => setOrderFormData({...orderFormData, fullName: e.target.value})}
-                          className={`w-full px-4 py-3 border rounded outline-none transition-all placeholder:text-white/20 ${
-                            isDarkMode ? 'bg-[#0A0A0A] border-white/10 text-white focus:border-[#D4AF37]' : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524]'
+                          className={`w-full px-4 py-3 border rounded outline-none transition-all ${
+                            isDarkMode 
+                              ? 'bg-[#0A0A0A] border-white/10 text-white focus:border-[#D4AF37] placeholder:text-white/20' 
+                              : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524] placeholder:text-gray-400'
                           }`}
                         />
                         <input 
@@ -511,28 +519,54 @@ export default function App() {
                           placeholder="Phone Number"
                           value={orderFormData.phone}
                           onChange={(e) => setOrderFormData({...orderFormData, phone: e.target.value})}
-                          className={`w-full px-4 py-3 border rounded outline-none transition-all placeholder:text-white/20 ${
-                            isDarkMode ? 'bg-[#0A0A0A] border-white/10 text-white focus:border-[#D4AF37]' : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524]'
+                          className={`w-full px-4 py-3 border rounded outline-none transition-all ${
+                            isDarkMode 
+                              ? 'bg-[#0A0A0A] border-white/10 text-white focus:border-[#D4AF37] placeholder:text-white/20' 
+                              : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524] placeholder:text-gray-400'
                           }`}
                         />
-                        <select 
-                          value={orderFormData.pickupTime}
-                          onChange={(e) => setOrderFormData({...orderFormData, pickupTime: e.target.value})}
-                          className={`w-full px-4 py-3 border rounded outline-none appearance-none ${
-                            isDarkMode ? 'bg-[#0A0A0A] border-white/10 text-white focus:border-[#D4AF37]' : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524]'
-                          }`}
-                        >
-                          <option>ASAP</option>
-                          <option>In 15 minutes</option>
-                          <option>In 30 minutes</option>
-                          <option>In 1 hour</option>
-                        </select>
+                        <div className="space-y-1">
+                          <label className={`text-[10px] font-bold uppercase tracking-widest ${isDarkMode ? 'text-white/40' : 'text-gray-400'}`}>Requested Pickup Time</label>
+                          <select 
+                            value={orderFormData.pickupTime}
+                            onChange={(e) => setOrderFormData({...orderFormData, pickupTime: e.target.value})}
+                            className={`w-full px-4 py-3 border rounded outline-none appearance-none ${
+                              isDarkMode ? 'bg-[#0A0A0A] border-white/10 text-white focus:border-[#D4AF37]' : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524]'
+                            }`}
+                          >
+                            {(() => {
+                              const timeMap: any = { 'ASAP': 0, '15 min': 15, '30 min': 30, '1 hr': 60 };
+                              const maxMinTime = Math.max(0, ...cart.map((i: any) => timeMap[i.minPickupTime] || 0));
+                              
+                              return [
+                                { label: 'ASAP', val: 0 },
+                                { label: 'In 15 minutes', val: 15 },
+                                { label: 'In 30 minutes', val: 30 },
+                                { label: 'In 1 hour', val: 60 }
+                              ].map(opt => (
+                                <option key={opt.label} disabled={opt.val < maxMinTime} value={opt.label === 'ASAP' ? 'ASAP' : opt.label}>
+                                  {opt.label} {opt.val < maxMinTime ? '(Unavailable for these items)' : ''}
+                                </option>
+                              ));
+                            })()}
+                          </select>
+                          {(() => {
+                            const timeMap: Record<string, number> = { 'ASAP': 0, '15 min': 15, '30 min': 30, '1 hr': 60 };
+                            const maxTime = Math.max(0, ...cart.map((i: any) => timeMap[i.minPickupTime] || 0));
+                            if (maxTime > 0) {
+                              return <p className="text-[10px] text-amber-500 font-medium">Some items in your cart require at least {maxTime} minutes to prepare.</p>;
+                            }
+                            return null;
+                          })()}
+                        </div>
                         <textarea 
                           placeholder="Any special instructions for the chef?"
                           value={orderFormData.notes}
                           onChange={(e) => setOrderFormData({...orderFormData, notes: e.target.value})}
-                          className={`w-full px-4 py-3 border rounded outline-none resize-none h-24 placeholder:text-white/20 ${
-                            isDarkMode ? 'bg-[#0A0A0A] border-white/10 text-white focus:border-[#D4AF37]' : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524]'
+                          className={`w-full px-4 py-3 border rounded outline-none resize-none h-24 transition-all ${
+                            isDarkMode 
+                              ? 'bg-[#0A0A0A] border-white/10 text-white focus:border-[#D4AF37] placeholder:text-white/20' 
+                              : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524] placeholder:text-gray-400'
                           }`}
                         />
                         <button 
@@ -1394,8 +1428,8 @@ function Home({
                               min={new Date().toISOString().split('T')[0]}
                               value={formData.date}
                               onChange={(e) => setFormData({...formData, date: e.target.value})}
-                              className={`w-full px-5 py-4 border rounded outline-none transition-all ${
-                                isDarkMode ? 'bg-[#0A0A0A] border-[#D4AF37]/20 text-white focus:border-[#D4AF37]' : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524]'
+                              className={`w-full px-5 py-4 border rounded outline-none transition-all [color-scheme:light] ${
+                                isDarkMode ? 'bg-[#0A0A0A] border-[#D4AF37]/20 text-white focus:border-[#D4AF37] [color-scheme:dark]' : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524]'
                               }`}
                             />
                           </div>
