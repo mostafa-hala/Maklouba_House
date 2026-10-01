@@ -1,0 +1,8 @@
+{
+  "name": "Maklouba House",
+  "description": "Authentic Palestinian and Arabic cuisine in Paterson, NJ. Experience traditional Maklouba, grilled meats, and authentic Middle Eastern hospitality.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

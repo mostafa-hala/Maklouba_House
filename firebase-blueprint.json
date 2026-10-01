@@ -1,0 +1,41 @@
+{
+  "entities": {
+    "reservation": {
+      "title": "Reservation",
+      "description": "Table reservation details",
+      "type": "object",
+      "properties": {
+        "fullName": { "type": "string", "maxLength": 100 },
+        "phone": { "type": "string", "pattern": "^[+]?[(]?[0-9]{3}[)]?[-s.]?[0-9]{3}[-s.]?[0-9]{4,6}$" },
+        "guests": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "time": { "type": "string" },
+        "requests": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["fullName", "phone", "guests", "date", "time"]
+    },
+    "review": {
+      "title": "Review",
+      "description": "Customer feedback and ratings",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "rating": { "type": "number", "minimum": 1, "maximum": 5 },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "rating", "text"]
+    }
+  },
+  "firestore": {
+    "/reservations/{reservationId}": {
+      "schema": "reservation",
+      "description": "Collection of table reservations"
+    },
+    "/reviews/{reviewId}": {
+      "schema": "review",
+      "description": "Collection of customer reviews"
+    }
+  }
+}
