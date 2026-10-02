@@ -118,7 +118,7 @@ export default function App() {
   const [orderFormData, setOrderFormData] = useState({
     fullName: '',
     phone: '',
-    pickupTime: 'ASAP',
+    pickupTime: 'In 15 minutes',
     notes: ''
   });
   const [isOrdering, setIsOrdering] = useState(false);
@@ -177,7 +177,7 @@ export default function App() {
         name: item.name, 
         price: item.price, 
         quantity: 1,
-        minPickupTime: item.minPickupTime || 'ASAP'
+        minPickupTime: item.minPickupTime && item.minPickupTime !== 'ASAP' ? item.minPickupTime : '15 min'
       }];
     });
     setIsCartOpen(true);
@@ -510,7 +510,7 @@ export default function App() {
                           className={`w-full px-4 py-3 border rounded outline-none transition-all ${
                             isDarkMode 
                               ? 'bg-[#0A0A0A] border-white/10 text-white focus:border-[#D4AF37] placeholder:text-white/20' 
-                              : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524] placeholder:text-gray-400'
+                              : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524] placeholder:text-gray-500'
                           }`}
                         />
                         <input 
@@ -522,7 +522,7 @@ export default function App() {
                           className={`w-full px-4 py-3 border rounded outline-none transition-all ${
                             isDarkMode 
                               ? 'bg-[#0A0A0A] border-white/10 text-white focus:border-[#D4AF37] placeholder:text-white/20' 
-                              : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524] placeholder:text-gray-400'
+                              : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524] placeholder:text-gray-500'
                           }`}
                         />
                         <div className="space-y-1">
@@ -535,25 +535,24 @@ export default function App() {
                             }`}
                           >
                             {(() => {
-                              const timeMap: any = { 'ASAP': 0, '15 min': 15, '30 min': 30, '1 hr': 60 };
-                              const maxMinTime = Math.max(0, ...cart.map((i: any) => timeMap[i.minPickupTime] || 0));
+                              const timeMap: any = { '15 min': 15, '30 min': 30, '1 hr': 60 };
+                              const maxMinTime = Math.max(15, ...cart.map((i: any) => timeMap[i.minPickupTime] || 0));
                               
                               return [
-                                { label: 'ASAP', val: 0 },
                                 { label: 'In 15 minutes', val: 15 },
                                 { label: 'In 30 minutes', val: 30 },
                                 { label: 'In 1 hour', val: 60 }
                               ].map(opt => (
-                                <option key={opt.label} disabled={opt.val < maxMinTime} value={opt.label === 'ASAP' ? 'ASAP' : opt.label}>
+                                <option key={opt.label} disabled={opt.val < maxMinTime} value={opt.label}>
                                   {opt.label} {opt.val < maxMinTime ? '(Unavailable for these items)' : ''}
                                 </option>
                               ));
                             })()}
                           </select>
                           {(() => {
-                            const timeMap: Record<string, number> = { 'ASAP': 0, '15 min': 15, '30 min': 30, '1 hr': 60 };
-                            const maxTime = Math.max(0, ...cart.map((i: any) => timeMap[i.minPickupTime] || 0));
-                            if (maxTime > 0) {
+                            const timeMap: Record<string, number> = { '15 min': 15, '30 min': 30, '1 hr': 60 };
+                            const maxTime = Math.max(15, ...cart.map((i: any) => timeMap[i.minPickupTime] || 0));
+                            if (maxTime > 15) {
                               return <p className="text-[10px] text-amber-500 font-medium">Some items in your cart require at least {maxTime} minutes to prepare.</p>;
                             }
                             return null;
@@ -566,7 +565,7 @@ export default function App() {
                           className={`w-full px-4 py-3 border rounded outline-none resize-none h-24 transition-all ${
                             isDarkMode 
                               ? 'bg-[#0A0A0A] border-white/10 text-white focus:border-[#D4AF37] placeholder:text-white/20' 
-                              : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524] placeholder:text-gray-400'
+                              : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524] placeholder:text-gray-500'
                           }`}
                         />
                         <button 
@@ -1428,8 +1427,10 @@ function Home({
                               min={new Date().toISOString().split('T')[0]}
                               value={formData.date}
                               onChange={(e) => setFormData({...formData, date: e.target.value})}
-                              className={`w-full px-5 py-4 border rounded outline-none transition-all [color-scheme:light] ${
-                                isDarkMode ? 'bg-[#0A0A0A] border-[#D4AF37]/20 text-white focus:border-[#D4AF37] [color-scheme:dark]' : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524]'
+                              className={`w-full px-5 py-4 border rounded outline-none transition-all ${
+                                isDarkMode 
+                                  ? 'bg-[#0A0A0A] border-[#D4AF37]/20 text-white focus:border-[#D4AF37] [color-scheme:dark]' 
+                                  : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524] [color-scheme:light]'
                               }`}
                             />
                           </div>
@@ -1457,10 +1458,14 @@ function Home({
                               isDarkMode ? 'bg-[#0A0A0A] border-[#D4AF37]/20 text-white focus:border-[#D4AF37]' : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524]'
                             }`}
                           >
-                            <option>12:00 PM</option>
-                            <option>2:00 PM</option>
-                            <option>6:00 PM</option>
-                            <option>8:00 PM</option>
+                            {Array.from({ length: 25 }).map((_, i) => {
+                              const hour = Math.floor(i / 2) + 10;
+                              const minutes = i % 2 === 0 ? '00' : '30';
+                              const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+                              const ampm = hour >= 12 ? 'PM' : 'AM';
+                              const timeStr = `${displayHour}:${minutes} ${ampm}`;
+                              return <option key={timeStr} value={timeStr}>{timeStr}</option>;
+                            })}
                           </select>
                         </div>
 
