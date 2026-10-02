@@ -71,7 +71,7 @@ export default function AdminDashboard() {
     price: '',
     description: '',
     imageUrl: '',
-    minPickupTime: 'ASAP'
+    minPickupTime: '15 min'
   });
 
   useEffect(() => {
@@ -137,7 +137,7 @@ export default function AdminDashboard() {
         price: newItem.price || '',
         description: newItem.description || '',
         imageUrl: newItem.imageUrl || '',
-        minPickupTime: newItem.minPickupTime || 'ASAP',
+        minPickupTime: newItem.minPickupTime || '15 min',
         available: true
       };
 
@@ -154,7 +154,7 @@ export default function AdminDashboard() {
         price: '',
         description: '',
         imageUrl: '',
-        minPickupTime: 'ASAP'
+        minPickupTime: '15 min'
       });
       setShowAddItem(false);
       setEditingId(null);
@@ -172,7 +172,7 @@ export default function AdminDashboard() {
       price: item.price || '',
       description: item.description || '',
       imageUrl: item.imageUrl || '',
-      minPickupTime: item.minPickupTime || 'ASAP'
+      minPickupTime: item.minPickupTime === 'ASAP' ? '15 min' : (item.minPickupTime || '15 min')
     });
     setEditingId(item.id);
     setShowAddItem(true);
@@ -393,7 +393,7 @@ export default function AdminDashboard() {
               <button 
                 onClick={() => {
                   setEditingId(null);
-                  setNewItem({ name: '', category: '', customCategory: '', price: '', description: '', imageUrl: '', minPickupTime: 'ASAP' });
+                  setNewItem({ name: '', category: '', customCategory: '', price: '', description: '', imageUrl: '', minPickupTime: '15 min' });
                   setShowAddItem(true);
                 }}
                 className="px-6 py-2 bg-[#D4AF37] text-[#701524] font-bold rounded shadow-lg flex items-center gap-2 hover:bg-[#b8982f] transition-all"
@@ -639,7 +639,6 @@ export default function AdminDashboard() {
                             onChange={e => setNewItem({...newItem, minPickupTime: e.target.value})}
                             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:border-[#701524] outline-none"
                           >
-                            <option value="ASAP">ASAP (Immediate)</option>
                             <option value="15 min">Minimum 15 Minutes</option>
                             <option value="30 min">Minimum 30 Minutes</option>
                             <option value="1 hr">Minimum 1 Hour</option>
@@ -720,7 +719,7 @@ export default function AdminDashboard() {
                           <div>
                             <h3 className="font-bold">{item.name}</h3>
                             <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter flex items-center gap-1">
-                              <Clock size={10} /> Min: {item.minPickupTime || 'ASAP'}
+                              <Clock size={10} /> Min: {item.minPickupTime === 'ASAP' ? '15 min' : (item.minPickupTime || '15 min')}
                             </span>
                           </div>
                           <span className="font-mono text-[#701524]">${item.price}</span>
