@@ -36,9 +36,9 @@ export default function OrderPage({ liveMenu, addToCart, cart, setIsCartOpen, is
       <main className="pt-32 pb-24 px-6">
         <div className="max-w-7xl mx-auto">
           <header className="mb-20 text-center">
-            <h1 className={`text-5xl md:text-7xl font-serif font-bold mb-6 ${isDarkMode ? 'text-[#D4AF37]' : 'text-[#701524]'}`}>Order Online</h1>
+            <h1 className={`text-5xl md:text-7xl font-display font-bold mb-6 text-glow-gold ${isDarkMode ? 'text-[#D4AF37]' : 'text-[#701524]'}`}>Order Online</h1>
             <p className={`text-lg max-w-2xl mx-auto font-light ${isDarkMode ? 'text-white/60' : 'text-[#666666]'}`}>Select your favorite dishes and we'll have them ready for pickup.</p>
-            <div className="w-24 h-1 bg-[#D4AF37] mx-auto mt-8" />
+            <div className="w-32 h-1 bg-[#D4AF37] mx-auto mt-8 shadow-[0_0_15px_rgba(212,175,55,0.4)]" />
           </header>
 
           <div className="grid lg:grid-cols-2 gap-x-24 gap-y-32">
@@ -51,7 +51,7 @@ export default function OrderPage({ liveMenu, addToCart, cart, setIsCartOpen, is
                 transition={{ duration: 0.6 }}
                 className="relative"
               >
-                <h3 className={`text-3xl md:text-4xl font-serif font-bold mb-12 border-b pb-4 ${
+                <h3 className={`text-3xl md:text-4xl font-display font-bold mb-12 border-b pb-4 ${
                   isDarkMode ? 'text-[#D4AF37] border-[#D4AF37]/20' : 'text-[#701524] border-[#D4AF37]/20'
                 }`}>{section.title}</h3>
                 <div className="space-y-10">
