@@ -18,7 +18,7 @@ export default function MenuPage({ isDarkMode }: any) {
             <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
             BACK TO HOME
           </Link>
-          <h1 className="text-xl md:text-2xl font-serif font-bold text-white">Our Full Menu</h1>
+          <h1 className="text-xl md:text-2xl font-display font-bold text-white">Our Full Menu</h1>
           <a 
             href="/menu.pdf" 
             download
@@ -32,9 +32,9 @@ export default function MenuPage({ isDarkMode }: any) {
 
       <main className="pt-32 pb-24 px-4 flex flex-col items-center gap-12 max-w-5xl mx-auto">
         <div className="text-center mb-4">
-          <p className="text-[#D4AF37] font-bold tracking-widest uppercase text-sm mb-2">Digital Menu</p>
-          <h2 className={`text-3xl md:text-5xl font-serif font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-[#701524]'}`}>Authentic Flavors</h2>
-          <div className="w-20 h-1 bg-[#D4AF37] mx-auto" />
+          <p className="text-[#D4AF37] font-bold tracking-widest uppercase text-sm mb-2 text-glow-gold">Digital Menu</p>
+          <h2 className={`text-3xl md:text-5xl font-display font-bold mb-4 text-glow-gold ${isDarkMode ? 'text-white' : 'text-[#701524]'}`}>Authentic Flavors</h2>
+          <div className="w-24 h-1 bg-[#D4AF37] mx-auto shadow-[0_0_10px_rgba(212,175,55,0.5)]" />
         </div>
 
         {menuPages.map((page, idx) => (
