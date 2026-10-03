@@ -850,8 +850,13 @@ function Home({
   }, []);
 
   return (
-    <div className={`min-h-screen selection:bg-[#D4AF37] selection:text-white transition-colors duration-500 ${isDarkMode ? 'bg-[#1A1A1A] text-[#FDFCF0]' : 'bg-[#FDFCF0] text-[#1A1A1A]'}`}>
-      {/* Splash Screen */}
+    <div className={`min-h-screen selection:bg-[#D4AF37] selection:text-white transition-colors duration-500 relative ${isDarkMode ? 'bg-[#1A1A1A] text-[#FDFCF0]' : 'bg-[#FDFCF0] text-[#1A1A1A]'}`}>
+      {/* Global Palestinian Style Background Pattern */}
+      <div className={`fixed inset-0 pointer-events-none z-0 opacity-[0.03] md:opacity-[0.05] bg-tatreez-tile bg-repeat ${isDarkMode ? 'invert brightness-200' : ''}`} />
+      <div className={`fixed inset-0 pointer-events-none z-0 opacity-[0.1] bg-stone-texture mix-blend-overlay ${isDarkMode ? 'opacity-[0.05]' : ''}`} />
+      
+      <div className="relative z-10">
+        {/* Splash Screen */}
       <AnimatePresence>
         {showSplash && (
           <motion.div 
@@ -1824,6 +1829,7 @@ function Home({
           )}
         </AnimatePresence>
       </main>
+      </div>
     </div>
   );
 }
