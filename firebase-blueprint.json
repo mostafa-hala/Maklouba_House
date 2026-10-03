@@ -26,6 +26,37 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["name", "rating", "text"]
+    },
+    "menuItem": {
+      "title": "Menu Item",
+      "description": "Details of a menu dish",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "category": { "type": "string" },
+        "price": { "type": "string" },
+        "description": { "type": "string", "maxLength": 500 },
+        "imageUrl": { "type": "string" },
+        "minPickupTime": { "type": "string", "enum": ["15 min", "30 min", "1 hr"] },
+        "available": { "type": "boolean" }
+      },
+      "required": ["name", "category", "price"]
+    },
+    "order": {
+      "title": "Order",
+      "description": "Customer pickup order",
+      "type": "object",
+      "properties": {
+        "fullName": { "type": "string", "maxLength": 100 },
+        "phone": { "type": "string" },
+        "pickupTime": { "type": "string" },
+        "total": { "type": "number" },
+        "items": { "type": "array", "items": { "type": "object" } },
+        "notes": { "type": "string", "maxLength": 500 },
+        "completed": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["fullName", "phone", "pickupTime", "total", "items"]
     }
   },
   "firestore": {
@@ -36,6 +67,14 @@
     "/reviews/{reviewId}": {
       "schema": "review",
       "description": "Collection of customer reviews"
+    },
+    "/menu/{itemId}": {
+      "schema": "menuItem",
+      "description": "Collection of menu items"
+    },
+    "/orders/{orderId}": {
+      "schema": "order",
+      "description": "Collection of customer orders"
     }
   }
 }
