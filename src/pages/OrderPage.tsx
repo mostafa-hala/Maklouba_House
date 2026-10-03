@@ -33,8 +33,11 @@ export default function OrderPage({ liveMenu, addToCart, cart, setIsCartOpen, is
         </div>
       </nav>
 
-      <main className="pt-32 pb-24 px-6">
-        <div className="max-w-7xl mx-auto">
+      <main className="pt-32 pb-24 px-6 relative overflow-hidden">
+        {/* Section Background Pattern */}
+        <div className="absolute inset-0 bg-tatreez-pattern opacity-[0.03] pointer-events-none" />
+        
+        <div className="max-w-7xl mx-auto relative z-10">
           <header className="mb-20 text-center">
             <h1 className={`text-5xl md:text-7xl font-display font-bold mb-6 text-glow-gold ${isDarkMode ? 'text-[#D4AF37]' : 'text-[#701524]'}`}>Order Online</h1>
             <p className={`text-lg max-w-2xl mx-auto font-light ${isDarkMode ? 'text-white/60' : 'text-[#666666]'}`}>Select your favorite dishes and we'll have them ready for pickup.</p>
