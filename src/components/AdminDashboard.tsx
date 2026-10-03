@@ -295,7 +295,7 @@ export default function AdminDashboard() {
           className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md"
         >
           <div className="text-center mb-10">
-            <h1 className="text-3xl font-serif font-bold text-[#701524] mb-2">Staff Portal</h1>
+            <h1 className="text-3xl font-display font-bold text-[#701524] mb-2">Staff Portal</h1>
             <p className="text-gray-500">Sign in to manage Maklouba House</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-6">
@@ -338,7 +338,7 @@ export default function AdminDashboard() {
       <div className="w-72 bg-[#701524] text-white flex flex-col p-6">
         <div className="mb-12 flex items-center gap-3">
           <div className="w-10 h-10 bg-[#D4AF37] rounded-full" />
-          <h2 className="text-xl font-serif font-bold text-[#D4AF37]">Staff Panel</h2>
+          <h2 className="text-xl font-display font-bold text-[#D4AF37]">Staff Panel</h2>
         </div>
 
         <nav className="flex-1 space-y-2">
@@ -380,7 +380,7 @@ export default function AdminDashboard() {
       <div className="flex-1 p-10 overflow-y-auto">
         <header className="flex justify-between items-center mb-10">
           <div>
-            <h1 className="text-3xl font-serif font-bold text-[#701524] capitalize">{activeTab}</h1>
+            <h1 className="text-3xl font-display font-bold text-[#701524] capitalize">{activeTab}</h1>
             <p className="text-gray-500">Real-time management for Maklouba House</p>
           </div>
           {activeTab === 'menu' && (
