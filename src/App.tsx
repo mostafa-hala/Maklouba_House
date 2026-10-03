@@ -331,13 +331,13 @@ export default function App() {
 
   return (
     <>
-      {/* Palestinian Tatreez Sidebar Decoration */}
-      <div className="fixed left-0 top-0 bottom-0 w-4 md:w-10 z-[40] opacity-80 pointer-events-none overflow-hidden hidden lg:block border-r-2 border-[#D4AF37]/40 bg-[#FDFCF0]">
-        <div className="h-[200%] w-full bg-tatreez-cactus" />
-      </div>
-      <div className="fixed right-0 top-0 bottom-0 w-4 md:w-10 z-[40] opacity-80 pointer-events-none overflow-hidden hidden lg:block border-l-2 border-[#D4AF37]/40 bg-[#FDFCF0]">
-        <div className="h-[200%] w-full bg-tatreez-cactus" />
-      </div>
+        {/* Palestinian Tatreez Sidebar Decoration */}
+        <div className="fixed left-0 top-0 bottom-0 w-2 md:w-12 z-[50] opacity-100 pointer-events-none overflow-hidden border-r-2 md:border-r-4 border-[#D4AF37] bg-[#FDFCF0] shadow-[5px_0_15px_rgba(0,0,0,0.2)]">
+          <div className="h-[200%] w-full bg-tatreez-cactus" />
+        </div>
+        <div className="fixed right-0 top-0 bottom-0 w-2 md:w-12 z-[50] opacity-100 pointer-events-none overflow-hidden border-l-2 md:border-l-4 border-[#D4AF37] bg-[#FDFCF0] shadow-[-5px_0_15px_rgba(0,0,0,0.2)]">
+          <div className="h-[200%] w-full bg-tatreez-cactus" />
+        </div>
 
       {/* Global Notifications for Staff */}
       <div className="fixed top-6 right-6 z-[9999] flex flex-col gap-4 pointer-events-none">
@@ -916,7 +916,7 @@ function Home({
           </div>
 
           {/* Zone 3: Primary Actions */}
-          <div className="flex items-center gap-4 text-white">
+        <div className="flex items-center gap-4 text-white">
             <button 
               onClick={() => setIsDarkMode(!isDarkMode)}
               className="p-2 hover:bg-white/10 rounded-full transition-all text-[#D4AF37]"
@@ -939,9 +939,7 @@ function Home({
             </button>
             <a 
               href="#reservations" 
-              className={`hidden sm:block px-6 py-2.5 bg-[#D4AF37] font-bold rounded hover:bg-white transition-all text-sm uppercase tracking-wider ${
-                isDarkMode ? 'text-[#0A0A0A]' : 'text-[#701524]'
-              }`}
+              className={`hidden sm:block px-6 py-2.5 bg-[#701524] border-2 border-[#D4AF37] text-[#D4AF37] font-bold rounded hover:bg-[#D4AF37] hover:text-[#1A1A1A] transition-all text-sm uppercase tracking-wider shadow-[0_0_15px_rgba(212,175,55,0.3)]`}
             >
               Reservation
             </a>
@@ -1031,14 +1029,14 @@ function Home({
               >
                 <a 
                   href="#reservations" 
-                  className="px-8 py-4 bg-[#D4AF37] text-[#0A0A0A] font-bold rounded flex items-center justify-center gap-3 hover:scale-105 transition-transform shadow-xl"
+                  className="px-8 py-4 bg-[#D4AF37] text-[#0A0A0A] font-bold rounded flex items-center justify-center gap-3 hover:scale-105 transition-transform shadow-[0_0_20px_rgba(212,175,55,0.4)] border-2 border-white/20"
                 >
                   <Calendar size={20} />
                   BOOK A TABLE
                 </a>
                 <Link 
                   to="/order" 
-                  className="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold rounded flex items-center justify-center gap-3 hover:bg-white/20 transition-all shadow-xl"
+                  className="px-8 py-4 bg-[#701524] backdrop-blur-md border-2 border-[#D4AF37] text-white font-bold rounded flex items-center justify-center gap-3 hover:bg-[#D4AF37] hover:text-[#1A1A1A] transition-all shadow-xl"
                 >
                   <Utensils size={20} />
                   VIEW OUR MENU
@@ -1079,13 +1077,15 @@ function Home({
               ].map((item, idx) => (
                 <motion.div 
                   key={idx}
-                  whileHover={{ y: -5 }}
+                  whileHover={{ y: -5, scale: 1.02 }}
                   className={`flex flex-col items-center text-center p-8 rounded-xl border-2 transition-all ${
-                    isDarkMode ? 'bg-[#1A1A1A] border-[#D4AF37]/30 shadow-[0_0_20px_rgba(212,175,55,0.1)]' : 'bg-white border-[#701524]/20 shadow-xl'
+                    isDarkMode 
+                      ? 'bg-[#242424] border-[#D4AF37] shadow-[0_0_30px_rgba(212,175,55,0.15)]' 
+                      : 'bg-white border-[#701524]/20 shadow-xl'
                   }`}
                 >
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-6 shadow-lg border-2 ${
-                    isDarkMode ? 'bg-[#1A1A1A] text-[#D4AF37] border-[#D4AF37]/50' : 'bg-[#701524] text-[#D4AF37] border-transparent'
+                  <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-6 shadow-xl border-2 ${
+                    isDarkMode ? 'bg-[#1A1A1A] text-[#D4AF37] border-[#D4AF37]' : 'bg-[#701524] text-[#D4AF37] border-transparent'
                   }`}>
                     {item.icon}
                   </div>
@@ -1110,9 +1110,9 @@ function Home({
         </section>
 
         {/* Brand Quality Parallax Section */}
-        <div className="h-24 w-full bg-tatreez-olive opacity-80 border-y-4 border-[#D4AF37]/60 shadow-[0_0_30px_rgba(212,175,55,0.2)]" />
+        <div className="h-28 w-full bg-tatreez-olive opacity-100 border-y-4 border-[#D4AF37] shadow-[0_0_50px_rgba(212,175,55,0.3)] bg-[#FDFCF0]" />
         <QualitySection isDarkMode={isDarkMode} />
-        <div className="h-24 w-full bg-tatreez-olive opacity-80 border-y-4 border-[#D4AF37]/60 shadow-[0_0_30px_rgba(212,175,55,0.2)]" />
+        <div className="h-28 w-full bg-tatreez-olive opacity-100 border-y-4 border-[#D4AF37] shadow-[0_0_50px_rgba(212,175,55,0.3)] bg-[#FDFCF0]" />
 
         {/* Menu Section */}
         <section id="menu" className={`py-20 md:py-32 transition-colors duration-500 ${isDarkMode ? 'bg-[#0A0A0A]' : 'bg-[#FDFCF0]'}`}>
@@ -1528,13 +1528,16 @@ function Home({
           </div>
         </section>
 
+        {/* Tatreez Divider */}
+        <div className="h-28 w-full bg-tatreez-olive opacity-100 border-y-4 border-[#D4AF37] bg-[#FDFCF0] shadow-xl relative z-20" />
+
         <section className={`py-20 md:py-32 transition-colors duration-500 ${isDarkMode ? 'bg-[#0A0A0A]' : 'bg-white'}`}>
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center mb-12 md:mb-20">
               <div className="flex justify-center mb-8">
                  <img src="/images/tatreez_birds_motif.jpg" alt="" className="w-32 h-32 object-contain" />
               </div>
-              <h2 className={`text-4xl md:text-5xl font-display font-bold mb-6 ${isDarkMode ? 'text-[#D4AF37]' : 'text-[#701524]'}`}>Stay Connected</h2>
+              <h2 className={`text-4xl md:text-5xl font-display font-bold mb-6 text-glow-gold ${isDarkMode ? 'text-[#D4AF37]' : 'text-[#701524]'}`}>Stay Connected</h2>
               <p className={`text-base md:text-lg max-w-2xl mx-auto mb-10 ${isDarkMode ? 'text-[#A0A0A0]' : 'text-gray-600'}`}>
                 Follow our journey, see our latest creations, and join the Maklouba House family on social media.
               </p>
@@ -1576,6 +1579,9 @@ function Home({
             </div>
           </div>
         </section>
+
+        {/* Tatreez Divider */}
+        <div className="h-28 w-full bg-tatreez-olive opacity-100 border-y-4 border-[#D4AF37] bg-[#FDFCF0] shadow-xl relative z-20" />
 
         <section id="testimonials" className={`py-32 overflow-hidden transition-colors duration-500 ${isDarkMode ? 'bg-[#121212]' : 'bg-[#FDFCF0]'}`}>
           <div className="max-w-7xl mx-auto px-6">
