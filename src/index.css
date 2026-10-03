@@ -20,12 +20,6 @@
     background-position: center;
   }
 
-  .bg-tatreez-pattern {
-    background-image: url('/images/tatreez_olive_divider.jpg');
-    background-repeat: repeat;
-    background-size: 300px auto;
-  }
-
   .text-glow-gold {
     text-shadow: 0 0 10px rgba(212, 175, 55, 0.4), 0 0 20px rgba(212, 175, 55, 0.2);
   }
@@ -34,7 +28,14 @@
     border-color: #D4AF37;
   }
 
-  .bg-cultural-red {
-    background-color: #701524;
+  .bg-tatreez-tile {
+    background-image: url('/images/tatreez_birds_motif.jpg');
+    background-repeat: repeat;
+    background-size: 200px;
+  }
+
+  .bg-stone-texture {
+    background-image: url('https://www.transparenttextures.com/patterns/pave.png');
+    background-repeat: repeat;
   }
 }
