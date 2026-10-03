@@ -30,8 +30,11 @@ export default function MenuPage({ isDarkMode }: any) {
         </div>
       </nav>
 
-      <main className="pt-32 pb-24 px-4 flex flex-col items-center gap-12 max-w-5xl mx-auto">
-        <div className="text-center mb-4">
+      <main className="pt-32 pb-24 px-4 flex flex-col items-center gap-12 max-w-5xl mx-auto relative overflow-hidden">
+        {/* Section Background Pattern */}
+        <div className="absolute inset-0 bg-tatreez-pattern opacity-[0.03] pointer-events-none" />
+        
+        <div className="text-center mb-4 relative z-10">
           <p className="text-[#D4AF37] font-bold tracking-widest uppercase text-sm mb-2 text-glow-gold">Digital Menu</p>
           <h2 className={`text-3xl md:text-5xl font-display font-bold mb-4 text-glow-gold ${isDarkMode ? 'text-white' : 'text-[#701524]'}`}>Authentic Flavors</h2>
           <div className="w-24 h-1 bg-[#D4AF37] mx-auto shadow-[0_0_10px_rgba(212,175,55,0.5)]" />
@@ -56,6 +59,8 @@ export default function MenuPage({ isDarkMode }: any) {
             />
           </motion.div>
         ))}
+
+        <div className="h-24 w-full bg-tatreez-olive opacity-100 border-y-4 border-[#D4AF37] bg-[#FDFCF0] shadow-xl relative z-10" />
 
         <motion.div 
           initial={{ opacity: 0 }}
