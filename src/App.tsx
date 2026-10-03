@@ -332,12 +332,16 @@ export default function App() {
   return (
     <>
         {/* Palestinian Tatreez Sidebar Decoration */}
-        <div className="fixed left-0 top-0 bottom-0 w-2 md:w-12 z-[50] opacity-100 pointer-events-none overflow-hidden border-r-2 md:border-r-4 border-[#D4AF37] bg-[#FDFCF0] shadow-[5px_0_15px_rgba(0,0,0,0.2)]">
-          <div className="h-[200%] w-full bg-tatreez-cactus" />
-        </div>
-        <div className="fixed right-0 top-0 bottom-0 w-2 md:w-12 z-[50] opacity-100 pointer-events-none overflow-hidden border-l-2 md:border-l-4 border-[#D4AF37] bg-[#FDFCF0] shadow-[-5px_0_15px_rgba(0,0,0,0.2)]">
-          <div className="h-[200%] w-full bg-tatreez-cactus" />
-        </div>
+        {!isAdminPath && (
+          <>
+            <div className="fixed left-0 top-0 bottom-0 w-2 md:w-12 z-[50] opacity-100 pointer-events-none overflow-hidden border-r-2 md:border-r-4 border-[#D4AF37] bg-[#FDFCF0] shadow-[5px_0_15px_rgba(0,0,0,0.2)]">
+              <div className="h-[200%] w-full bg-tatreez-cactus" />
+            </div>
+            <div className="fixed right-0 top-0 bottom-0 w-2 md:w-12 z-[50] opacity-100 pointer-events-none overflow-hidden border-l-2 md:border-l-4 border-[#D4AF37] bg-[#FDFCF0] shadow-[-5px_0_15px_rgba(0,0,0,0.2)]">
+              <div className="h-[200%] w-full bg-tatreez-cactus" />
+            </div>
+          </>
+        )}
 
       {/* Global Notifications for Staff */}
       <div className="fixed top-6 right-6 z-[9999] flex flex-col gap-4 pointer-events-none">
@@ -846,14 +850,14 @@ function Home({
   }, []);
 
   return (
-    <div className={`min-h-screen selection:bg-[#D4AF37] selection:text-white transition-colors duration-500 ${isDarkMode ? 'bg-[#0A0A0A] text-[#FDFCF0]' : 'bg-[#FDFCF0] text-[#1A1A1A]'}`}>
+    <div className={`min-h-screen selection:bg-[#D4AF37] selection:text-white transition-colors duration-500 ${isDarkMode ? 'bg-[#1A1A1A] text-[#FDFCF0]' : 'bg-[#FDFCF0] text-[#1A1A1A]'}`}>
       {/* Splash Screen */}
       <AnimatePresence>
         {showSplash && (
           <motion.div 
             initial={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 1, ease: "easeInOut" } }}
-            className={`fixed inset-0 z-[100] flex items-center justify-center p-6 ${isDarkMode ? 'bg-[#0A0A0A]' : 'bg-[#701524]'}`}
+            className={`fixed inset-0 z-[100] flex items-center justify-center p-6 ${isDarkMode ? 'bg-[#1A1A1A]' : 'bg-[#701524]'}`}
           >
             <div className="text-center">
               <motion.div
@@ -874,9 +878,11 @@ function Home({
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 1, duration: 0.8 }}
               >
+                <div className="h-10 w-full bg-tatreez-olive opacity-100 border-y-2 border-[#D4AF37] bg-[#FDFCF0] mb-8" />
                 <h2 className="text-5xl md:text-7xl font-display font-bold text-[#D4AF37] mb-4 drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">Welcome to Maklouba House</h2>
                 <div className="w-24 h-1.5 bg-[#D4AF37] mx-auto mb-8 shadow-lg" />
                 <p className="text-white/90 text-xl md:text-2xl uppercase tracking-[0.4em] animate-pulse font-bold">Authentic Taste of Palestine</p>
+                <div className="h-10 w-full bg-tatreez-olive opacity-100 border-y-2 border-[#D4AF37] bg-[#FDFCF0] mt-8" />
               </motion.div>
             </div>
           </motion.div>
@@ -884,11 +890,13 @@ function Home({
       </AnimatePresence>
 
       {/* Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      <nav className={`fixed top-0 left-0 right-0 z-[60] transition-all duration-500 ${
         isScrolled 
-          ? (isDarkMode ? 'bg-[#0A0A0A]/95 backdrop-blur-md h-16 md:h-20 shadow-xl border-b border-white/5' : 'bg-[#701524]/95 backdrop-blur-md h-16 md:h-20 shadow-xl') 
+          ? (isDarkMode ? 'bg-[#1A1A1A]/95 backdrop-blur-md h-16 md:h-20 shadow-xl border-b-2 border-[#D4AF37]' : 'bg-[#701524]/95 backdrop-blur-md h-16 md:h-20 shadow-xl border-b-2 border-[#D4AF37]') 
           : 'bg-transparent h-20 md:h-28'
       }`}>
+        {/* Navigation Tatreez Accent */}
+        {isScrolled && <div className="absolute bottom-0 left-0 right-0 h-1 bg-tatreez-olive opacity-80" />}
         <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
           {/* Zone 1: Brand */}
           <div className="flex items-center gap-4">
@@ -980,6 +988,7 @@ function Home({
       <main className="pt-20">
         {/* Hero Section */}
         <section id="home" className="relative h-[100vh] flex items-center overflow-hidden -mt-20">
+          {isDarkMode && <div className="absolute inset-0 bg-tatreez-olive opacity-5 pointer-events-none z-[1]" />}
           <motion.div 
             initial={{ scale: 1.1 }}
             animate={{ scale: 1 }}
@@ -1057,7 +1066,9 @@ function Home({
         </section>
 
         {/* Feature Highlights */}
-        <section className={`py-24 transition-colors duration-500 relative overflow-hidden ${isDarkMode ? 'bg-[#121212]' : 'bg-[#FDFCF0]'}`}>
+        <div className="h-10 w-full bg-tatreez-olive opacity-100 border-y border-[#D4AF37] bg-[#FDFCF0] shadow-sm relative z-20" />
+        <section className={`py-24 transition-colors duration-500 relative overflow-hidden ${isDarkMode ? 'bg-[#1A1A1A]' : 'bg-[#FDFCF0]'}`}>
+          {isDarkMode && <div className="absolute inset-0 bg-tatreez-olive opacity-5 pointer-events-none" />}
           {/* Decorative Birds Motif */}
           <div className="absolute top-10 left-1/2 -translate-x-1/2 opacity-40 pointer-events-none">
             <img src="/images/tatreez_birds_motif.jpg" alt="" className="w-64 h-64 object-contain shadow-[0_0_50px_rgba(112,21,36,0.3)]" />
@@ -1110,16 +1121,12 @@ function Home({
         </section>
 
         {/* Brand Quality Parallax Section */}
-        <div className="h-28 w-full bg-tatreez-olive opacity-100 border-y-4 border-[#D4AF37] shadow-[0_0_50px_rgba(212,175,55,0.3)] bg-[#FDFCF0]" />
         <QualitySection isDarkMode={isDarkMode} />
-        <div className="h-28 w-full bg-tatreez-olive opacity-100 border-y-4 border-[#D4AF37] shadow-[0_0_50px_rgba(212,175,55,0.3)] bg-[#FDFCF0]" />
 
         {/* Menu Section */}
-        <section id="menu" className={`py-20 md:py-32 transition-colors duration-500 ${isDarkMode ? 'bg-[#0A0A0A]' : 'bg-[#FDFCF0]'}`}>
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="flex justify-center mb-12">
-               <div className="h-16 w-32 bg-tatreez-olive bg-no-repeat bg-center opacity-40" />
-            </div>
+        <section id="menu" className={`py-20 md:py-32 transition-colors duration-500 relative overflow-hidden ${isDarkMode ? 'bg-[#1A1A1A]' : 'bg-[#FDFCF0]'}`}>
+          {isDarkMode && <div className="absolute inset-0 bg-tatreez-olive opacity-5 pointer-events-none" />}
+          <div className="max-w-7xl mx-auto px-6 relative z-10">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -1238,7 +1245,8 @@ function Home({
         </AnimatePresence>
 
         {/* Delivery / Takeaway Section */}
-        <section id="delivery" className={`py-32 overflow-hidden relative border-y transition-colors duration-500 ${isDarkMode ? 'bg-[#111111] border-white/5' : 'bg-[#701524] border-transparent'}`}>
+        <section id="delivery" className={`py-32 overflow-hidden relative border-y transition-colors duration-500 ${isDarkMode ? 'bg-[#1A1A1A] border-white/5' : 'bg-[#701524] border-transparent'}`}>
+          {isDarkMode && <div className="absolute inset-0 bg-tatreez-olive opacity-5 pointer-events-none" />}
           <div className="absolute right-0 top-0 bottom-0 w-1/3 opacity-10 pointer-events-none">
              <div className="w-full h-full bg-[radial-gradient(circle_at_center,_#D4AF37_0%,_transparent_70%)] blur-3xl" />
           </div>
@@ -1316,7 +1324,8 @@ function Home({
         </section>
 
         {/* Reservations Section */}
-        <section id="reservations" className={`py-32 transition-colors duration-500 ${isDarkMode ? 'bg-[#121212]' : 'bg-white/30'}`}>
+        <section id="reservations" className={`py-32 transition-colors duration-500 relative overflow-hidden ${isDarkMode ? 'bg-[#1A1A1A]' : 'bg-white/30'}`}>
+          {isDarkMode && <div className="absolute inset-0 bg-tatreez-olive opacity-5 pointer-events-none" />}
           <div className="max-w-7xl mx-auto px-6">
             <div className="grid lg:grid-cols-2 gap-20 items-center">
               <motion.div 
@@ -1377,10 +1386,14 @@ function Home({
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className={`p-8 md:p-10 rounded-3xl shadow-2xl border ${
-                        isDarkMode ? 'bg-[#1A1A1A] border-[#D4AF37]/10' : 'bg-white border-[#701524]/10'
+                      className={`p-8 md:p-10 rounded-3xl shadow-2xl border-4 relative overflow-hidden ${
+                        isDarkMode ? 'bg-[#1A1A1A] border-[#D4AF37]' : 'bg-white border-[#701524]'
                       }`}
                     >
+                      {/* Form Tatreez Accents */}
+                      <div className="absolute top-0 left-0 right-0 h-2 bg-tatreez-olive opacity-30" />
+                      <div className="absolute bottom-0 left-0 right-0 h-2 bg-tatreez-olive opacity-30" />
+                      
                       <form className="space-y-6" onSubmit={handleReservation}>
                         {error && (
                           <div className="p-4 bg-red-900/20 border border-red-500/30 text-red-400 rounded text-sm">
@@ -1528,10 +1541,9 @@ function Home({
           </div>
         </section>
 
-        {/* Tatreez Divider */}
-        <div className="h-28 w-full bg-tatreez-olive opacity-100 border-y-4 border-[#D4AF37] bg-[#FDFCF0] shadow-xl relative z-20" />
-
-        <section className={`py-20 md:py-32 transition-colors duration-500 ${isDarkMode ? 'bg-[#0A0A0A]' : 'bg-white'}`}>
+        {/* Social Section */}
+        <section className={`py-20 md:py-32 transition-colors duration-500 relative overflow-hidden ${isDarkMode ? 'bg-[#1A1A1A]' : 'bg-white'}`}>
+          {isDarkMode && <div className="absolute inset-0 bg-tatreez-olive opacity-5 pointer-events-none" />}
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center mb-12 md:mb-20">
               <div className="flex justify-center mb-8">
@@ -1580,10 +1592,9 @@ function Home({
           </div>
         </section>
 
-        {/* Tatreez Divider */}
-        <div className="h-28 w-full bg-tatreez-olive opacity-100 border-y-4 border-[#D4AF37] bg-[#FDFCF0] shadow-xl relative z-20" />
-
-        <section id="testimonials" className={`py-32 overflow-hidden transition-colors duration-500 ${isDarkMode ? 'bg-[#121212]' : 'bg-[#FDFCF0]'}`}>
+        {/* Testimonials Section */}
+        <section id="testimonials" className={`py-32 overflow-hidden transition-colors duration-500 relative overflow-hidden ${isDarkMode ? 'bg-[#1A1A1A]' : 'bg-[#FDFCF0]'}`}>
+          {isDarkMode && <div className="absolute inset-0 bg-tatreez-olive opacity-5 pointer-events-none" />}
           <div className="max-w-7xl mx-auto px-6">
             <div className="grid lg:grid-cols-3 gap-20">
               <div className="lg:col-span-2">
