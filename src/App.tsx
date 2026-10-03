@@ -50,6 +50,7 @@ const COLORS = {
   accent: '#0A0A0A', // Deep Dark
   text: '#FDFCF0', // Light Cream
   textMuted: '#A0A0A0', // Muted Light
+  cultural: '#701524', // Palestinian Red
 };
 
 export default function App() {
@@ -113,17 +114,17 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
 
   // Order Form State
-  const [cart, setCart] = useState<{id: string, name: string, price: string, quantity: number}[]>([]);
+  const [cart, setCart] = useState<{id: string, name: string, price: string, quantity: number, minPickupTime?: string}[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [orderFormData, setOrderFormData] = useState({
     fullName: '',
     phone: '',
-    pickupTime: 'In 15 minutes',
+    pickupTime: '15 min',
     notes: ''
   });
   const [isOrdering, setIsOrdering] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
-  
+
   // Testimonials State
   const [reviews, setReviews] = useState<{id: string, name: string, rating: number, text: string, createdAt: any}[]>([]);
   const [reviewForm, setReviewForm] = useState({ name: '', rating: 5, text: '' });
@@ -219,7 +220,7 @@ export default function App() {
       setOrderFormData({
         fullName: '',
         phone: '',
-        pickupTime: 'ASAP',
+        pickupTime: '15 min',
         notes: ''
       });
     } catch (err) {
@@ -330,6 +331,14 @@ export default function App() {
 
   return (
     <>
+      {/* Palestinian Tatreez Sidebar Decoration */}
+      <div className="fixed left-0 top-0 bottom-0 w-4 md:w-10 z-[40] opacity-80 pointer-events-none overflow-hidden hidden lg:block border-r-2 border-[#D4AF37]/40 bg-[#FDFCF0]">
+        <div className="h-[200%] w-full bg-tatreez-cactus" />
+      </div>
+      <div className="fixed right-0 top-0 bottom-0 w-4 md:w-10 z-[40] opacity-80 pointer-events-none overflow-hidden hidden lg:block border-l-2 border-[#D4AF37]/40 bg-[#FDFCF0]">
+        <div className="h-[200%] w-full bg-tatreez-cactus" />
+      </div>
+
       {/* Global Notifications for Staff */}
       <div className="fixed top-6 right-6 z-[9999] flex flex-col gap-4 pointer-events-none">
         <AnimatePresence>
@@ -425,18 +434,18 @@ export default function App() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className={`absolute top-0 right-0 bottom-0 w-full max-w-md z-[70] shadow-2xl flex flex-col border-l transition-colors duration-500 ${
-                isDarkMode ? 'bg-[#1A1A1A] border-[#D4AF37]/10' : 'bg-white border-gray-100'
+              className={`absolute top-0 right-0 bottom-0 w-full max-w-md z-[70] shadow-2xl flex flex-col border-l-4 transition-colors duration-500 ${
+                isDarkMode ? 'bg-[#1A1A1A] border-[#D4AF37]' : 'bg-[#FDFCF0] border-[#701524]'
               }`}
             >
               <div className={`p-6 flex items-center justify-between border-b ${
-                isDarkMode ? 'bg-[#1A1A1A] text-white border-white/5' : 'bg-[#701524] text-white border-transparent'
+                isDarkMode ? 'bg-[#1A1A1A] text-white border-[#D4AF37]/20' : 'bg-[#701524] text-white border-transparent'
               }`}>
                 <div className="flex items-center gap-3">
                   <ShoppingBag size={24} className="text-[#D4AF37]" />
-                  <h2 className="text-xl font-serif font-bold">Your Pickup Order</h2>
+                  <h2 className="text-xl font-display font-bold">Your Pickup Order</h2>
                 </div>
-                <button onClick={() => setIsCartOpen(false)} className="p-2 hover:bg-white/10 rounded-full">
+                <button onClick={() => setIsCartOpen(false)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
                   <X size={24} />
                 </button>
               </div>
@@ -509,8 +518,8 @@ export default function App() {
                           onChange={(e) => setOrderFormData({...orderFormData, fullName: e.target.value})}
                           className={`w-full px-4 py-3 border rounded outline-none transition-all ${
                             isDarkMode 
-                              ? 'bg-[#0A0A0A] border-white/10 text-white focus:border-[#D4AF37] placeholder:text-white/20' 
-                              : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524] placeholder:text-gray-500'
+                              ? 'bg-[#0A0A0A] border-white/10 text-white focus:border-[#D4AF37] placeholder:text-white/40' 
+                              : 'bg-white border-gray-300 text-[#1A1A1A] focus:border-[#701524] placeholder:text-gray-400'
                           }`}
                         />
                         <input 
@@ -521,37 +530,37 @@ export default function App() {
                           onChange={(e) => setOrderFormData({...orderFormData, phone: e.target.value})}
                           className={`w-full px-4 py-3 border rounded outline-none transition-all ${
                             isDarkMode 
-                              ? 'bg-[#0A0A0A] border-white/10 text-white focus:border-[#D4AF37] placeholder:text-white/20' 
-                              : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524] placeholder:text-gray-500'
+                              ? 'bg-[#0A0A0A] border-white/10 text-white focus:border-[#D4AF37] placeholder:text-white/40' 
+                              : 'bg-white border-gray-300 text-[#1A1A1A] focus:border-[#701524] placeholder:text-gray-400'
                           }`}
                         />
                         <div className="space-y-1">
-                          <label className={`text-[10px] font-bold uppercase tracking-widest ${isDarkMode ? 'text-white/40' : 'text-gray-400'}`}>Requested Pickup Time</label>
+                          <label className={`text-[10px] font-bold uppercase tracking-widest ${isDarkMode ? 'text-white/40' : 'text-[#701524]/60'}`}>Requested Pickup Time</label>
                           <select 
                             value={orderFormData.pickupTime}
                             onChange={(e) => setOrderFormData({...orderFormData, pickupTime: e.target.value})}
                             className={`w-full px-4 py-3 border rounded outline-none appearance-none ${
-                              isDarkMode ? 'bg-[#0A0A0A] border-white/10 text-white focus:border-[#D4AF37]' : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524]'
+                              isDarkMode ? 'bg-[#0A0A0A] border-white/10 text-white focus:border-[#D4AF37]' : 'bg-white border-gray-300 text-[#1A1A1A] focus:border-[#701524]'
                             }`}
                           >
                             {(() => {
-                              const timeMap: any = { '15 min': 15, '30 min': 30, '1 hr': 60 };
-                              const maxMinTime = Math.max(15, ...cart.map((i: any) => timeMap[i.minPickupTime] || 0));
+                              const timeMap: Record<string, number> = { '15 min': 15, '30 min': 30, '1 hr': 60 };
+                              const maxMinTime = Math.max(15, ...cart.map((i: any) => timeMap[i.minPickupTime || ''] || 0));
                               
                               return [
-                                { label: 'In 15 minutes', val: 15 },
-                                { label: 'In 30 minutes', val: 30 },
-                                { label: 'In 1 hour', val: 60 }
+                                { label: '15 min', val: 15 },
+                                { label: '30 min', val: 30 },
+                                { label: '1 hr', val: 60 }
                               ].map(opt => (
                                 <option key={opt.label} disabled={opt.val < maxMinTime} value={opt.label}>
-                                  {opt.label} {opt.val < maxMinTime ? '(Unavailable for these items)' : ''}
+                                  {opt.label} {opt.val < maxMinTime ? '(Wait time required)' : ''}
                                 </option>
                               ));
                             })()}
                           </select>
                           {(() => {
                             const timeMap: Record<string, number> = { '15 min': 15, '30 min': 30, '1 hr': 60 };
-                            const maxTime = Math.max(15, ...cart.map((i: any) => timeMap[i.minPickupTime] || 0));
+                            const maxTime = Math.max(15, ...cart.map((i: any) => timeMap[i.minPickupTime || ''] || 0));
                             if (maxTime > 15) {
                               return <p className="text-[10px] text-amber-500 font-medium">Some items in your cart require at least {maxTime} minutes to prepare.</p>;
                             }
@@ -587,41 +596,45 @@ export default function App() {
       </AnimatePresence>
 
       {/* Shared UI: Footer */}
-      <footer className="bg-[#1A1A1A] text-white py-24">
-        <div className="max-w-7xl mx-auto px-6">
+      <footer className="bg-[#1A1A1A] text-white py-24 relative overflow-hidden">
+        {/* Pattern Overlay */}
+        <div className="absolute inset-0 bg-tatreez-olive opacity-5 pointer-events-none" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.5)]" />
+        
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="grid md:grid-cols-4 gap-16 mb-20">
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center gap-4 mb-8">
                 <img 
                   src="/images/maklouba_house_branding_logo_1790434541805.jpg" 
                   alt="Maklouba House Logo" 
-                  className="w-16 h-16 rounded-full border-2 border-[#D4AF37]"
+                  className="w-16 h-16 rounded-full border-2 border-[#D4AF37] shadow-[0_0_20px_rgba(212,175,55,0.3)]"
                 />
-                <h2 className="text-4xl font-serif font-bold text-[#D4AF37]">Maklouba House</h2>
+                <h2 className="text-4xl font-display font-bold text-[#D4AF37] drop-shadow-md">Maklouba House</h2>
               </div>
-              <p className="text-white/60 text-lg leading-relaxed max-w-md">
+              <p className="text-white/70 text-lg leading-relaxed max-w-md font-serif italic">
                 Dedicated to preserving the rich culinary heritage of Palestine. We bring authentic flavors and traditional hospitality to the heart of Paterson, NJ.
               </p>
               <div className="flex gap-6 mt-10">
-                <a href="https://www.tiktok.com/@maklouba.house" target="_blank" className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-[#D4AF37] hover:border-[#D4AF37] transition-all">
-                  <Music2 size={20} />
+                <a href="https://www.tiktok.com/@maklouba.house" target="_blank" className="w-12 h-12 rounded-full border-2 border-[#D4AF37]/30 flex items-center justify-center hover:bg-[#D4AF37] hover:border-[#D4AF37] transition-all group shadow-lg">
+                  <Music2 size={20} className="text-[#D4AF37] group-hover:text-[#1A1A1A]" />
                 </a>
-                <a href="https://www.instagram.com/maklouba_house" target="_blank" className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-[#D4AF37] hover:border-[#D4AF37] transition-all">
-                  <Instagram size={20} />
+                <a href="https://www.instagram.com/maklouba_house" target="_blank" className="w-12 h-12 rounded-full border-2 border-[#D4AF37]/30 flex items-center justify-center hover:bg-[#D4AF37] hover:border-[#D4AF37] transition-all group shadow-lg">
+                  <Instagram size={20} className="text-[#D4AF37] group-hover:text-[#1A1A1A]" />
                 </a>
               </div>
             </div>
 
             <div>
-              <h3 className="text-xl font-bold mb-8 font-serif border-b border-[#D4AF37] pb-4 inline-block">Contact</h3>
-              <ul className="space-y-6 text-white/70">
+              <h3 className="text-xl font-display font-bold mb-8 text-[#D4AF37] border-b-2 border-[#D4AF37]/30 pb-4 inline-block">Contact</h3>
+              <ul className="space-y-6 text-white/70 font-serif">
                 <li className="flex items-start gap-4">
                   <MapPin className="text-[#D4AF37] shrink-0" size={20} />
-                  <span>1068 Main St, Paterson, NJ 07503</span>
+                  <span className="hover:text-white transition-colors cursor-default">1068 Main St, Paterson, NJ 07503</span>
                 </li>
                 <li className="flex items-center gap-4">
                   <Phone className="text-[#D4AF37] shrink-0" size={20} />
-                  <a href="tel:9733218611" className="hover:text-white transition-colors">(973) 321-8611</a>
+                  <a href="tel:9733218611" className="hover:text-[#D4AF37] transition-colors">(973) 321-8611</a>
                 </li>
                 <li className="flex items-center gap-4">
                   <Clock className="text-[#D4AF37] shrink-0" size={20} />
@@ -631,24 +644,21 @@ export default function App() {
             </div>
 
             <div>
-              <h3 className="text-xl font-bold mb-8 font-serif border-b border-[#D4AF37] pb-4 inline-block">Quick Links</h3>
-              <ul className="space-y-4 text-white/70">
-                <li><Link to="/" className="hover:text-[#D4AF37] transition-colors">Home</Link></li>
-                <li><Link to="/menu" className="hover:text-[#D4AF37] transition-colors">Our Menu</Link></li>
-                <li><a href="#reservations" className="hover:text-[#D4AF37] transition-colors">Reservations</a></li>
-                <li><Link to="/order" className="hover:text-[#D4AF37] transition-colors">Order Online</Link></li>
+              <h3 className="text-xl font-display font-bold mb-8 text-[#D4AF37] border-b-2 border-[#D4AF37]/30 pb-4 inline-block">Quick Links</h3>
+              <ul className="space-y-4 text-white/70 font-serif">
+                <li><Link to="/" className="hover:text-[#D4AF37] transition-colors flex items-center gap-2"><ChevronRight size={14} className="text-[#D4AF37]" /> Home</Link></li>
+                <li><Link to="/menu" className="hover:text-[#D4AF37] transition-colors flex items-center gap-2"><ChevronRight size={14} className="text-[#D4AF37]" /> Our Menu</Link></li>
+                <li><a href="#reservations" className="hover:text-[#D4AF37] transition-colors flex items-center gap-2"><ChevronRight size={14} className="text-[#D4AF37]" /> Reservations</a></li>
+                <li><Link to="/order" className="hover:text-[#D4AF37] transition-colors flex items-center gap-2"><ChevronRight size={14} className="text-[#D4AF37]" /> Order Online</Link></li>
               </ul>
             </div>
           </div>
-
-          <div className="pt-12 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-8 text-white/40 text-sm">
             <p>© {new Date().getFullYear()} Maklouba House. All rights reserved.</p>
             <div className="flex gap-8">
               <a href="#" className="hover:text-white">Privacy Policy</a>
               <a href="#" className="hover:text-white">Terms of Service</a>
             </div>
           </div>
-        </div>
       </footer>
 
       {/* Shared UI: Menu Item Detail Modal */}
@@ -753,9 +763,9 @@ function QualitySection({ isDarkMode }: { isDarkMode: boolean }) {
           >
             <div className="flex items-center justify-center lg:justify-start gap-3 mb-4 md:mb-6">
               <div className="w-8 md:w-12 h-px bg-[#D4AF37]" />
-              <p className="text-[#D4AF37] font-serif italic text-base md:text-xl tracking-wide">Cooked to perfection</p>
+              <p className="text-[#D4AF37] font-serif italic text-base md:text-xl tracking-wide text-glow-gold">Cooked to perfection</p>
             </div>
-            <h2 className={`text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-serif font-bold leading-[1.2] md:leading-tight mb-6 md:mb-8 ${isDarkMode ? 'text-white' : 'text-[#701524]'}`}>
+            <h2 className={`text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-display font-bold leading-[1.2] md:leading-tight mb-6 md:mb-8 text-glow-gold ${isDarkMode ? 'text-white' : 'text-[#701524]'}`}>
               Fresh And Authentic <br />
               <span className="italic font-light">Cuisine</span> Made With The <br />
               Highest Quality Ingredients
@@ -767,7 +777,7 @@ function QualitySection({ isDarkMode }: { isDarkMode: boolean }) {
             {/* Photo 1 */}
             <motion.div 
               style={{ y: isMobile ? 0 : y1 }}
-              className="relative md:absolute md:right-0 md:top-0 w-full md:w-4/5 aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl z-0 border-4 border-white/5"
+              className="relative md:absolute md:right-0 md:top-0 w-full md:w-4/5 aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl z-0 border-4 border-[#D4AF37]/30"
             >
               <img 
                 src="/images/77cb2c6e-826f-4366-bb46-4eed2162b755.jpg" 
@@ -780,7 +790,7 @@ function QualitySection({ isDarkMode }: { isDarkMode: boolean }) {
             {/* Photo 2 */}
             <motion.div 
               style={{ y: isMobile ? 0 : y2 }}
-              className="relative md:absolute md:left-0 md:bottom-0 w-full md:w-3/4 aspect-square rounded-2xl overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.6)] z-10 border-4 border-white/10"
+              className="relative md:absolute md:left-0 md:bottom-0 w-full md:w-3/4 aspect-square rounded-2xl overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.6)] z-10 border-4 border-[#D4AF37]/50"
             >
               <img 
                 src="/images/77dff7e9-7a0a-408e-8e7d-7270d3da7d5f.jpg" 
@@ -850,12 +860,13 @@ function Home({
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 1.2, ease: "easeOut" }}
-                className="max-w-xl mx-auto mb-10"
+                className="max-w-xl mx-auto mb-10 relative"
               >
+                <div className="absolute -inset-10 bg-[#D4AF37] rounded-full blur-3xl opacity-20 animate-pulse" />
                 <img 
                   src="/images/maklouba_house_branding_logo_1790434541805.jpg" 
                   alt="Maklouba House Logo" 
-                  className="w-full h-auto rounded-full shadow-2xl border-4 border-[#D4AF37]"
+                  className="w-full h-auto rounded-full shadow-[0_0_60px_rgba(212,175,55,0.4)] border-8 border-[#D4AF37] relative z-10"
                 />
               </motion.div>
               <motion.div
@@ -863,9 +874,9 @@ function Home({
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 1, duration: 0.8 }}
               >
-                <h2 className="text-5xl md:text-7xl font-serif font-bold text-[#D4AF37] mb-4">Welcome to Maklouba House</h2>
-                <div className="w-24 h-1.5 bg-[#D4AF37] mx-auto mb-8" />
-                <p className="text-white/80 text-xl md:text-2xl uppercase tracking-[0.4em] animate-pulse">Authentic Taste of Palestine</p>
+                <h2 className="text-5xl md:text-7xl font-display font-bold text-[#D4AF37] mb-4 drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">Welcome to Maklouba House</h2>
+                <div className="w-24 h-1.5 bg-[#D4AF37] mx-auto mb-8 shadow-lg" />
+                <p className="text-white/90 text-xl md:text-2xl uppercase tracking-[0.4em] animate-pulse font-bold">Authentic Taste of Palestine</p>
               </motion.div>
             </div>
           </motion.div>
@@ -1000,7 +1011,7 @@ function Home({
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-serif font-bold mb-6 md:mb-8 leading-[1.1] md:leading-[1.05] text-wrap-balance"
+                className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-display font-bold mb-6 md:mb-8 leading-[1.1] md:leading-[1.05] text-wrap-balance text-glow-gold"
               >
                 The Heart of <br /><span className="text-[#D4AF37]">Palestine</span>
               </motion.h1>
@@ -1048,15 +1059,17 @@ function Home({
         </section>
 
         {/* Feature Highlights */}
-        <section className={`py-24 transition-colors duration-500 ${isDarkMode ? 'bg-[#121212]' : 'bg-white/50'}`}>
-          <div className="max-w-7xl mx-auto px-6">
+        <section className={`py-24 transition-colors duration-500 relative overflow-hidden ${isDarkMode ? 'bg-[#121212]' : 'bg-[#FDFCF0]'}`}>
+          {/* Decorative Birds Motif */}
+          <div className="absolute top-10 left-1/2 -translate-x-1/2 opacity-40 pointer-events-none">
+            <img src="/images/tatreez_birds_motif.jpg" alt="" className="w-64 h-64 object-contain shadow-[0_0_50px_rgba(112,21,36,0.3)]" />
+          </div>
+          
+          <div className="max-w-7xl mx-auto px-6 relative z-10">
             <motion.div 
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              variants={{
-                visible: { transition: { staggerChildren: 0.2 } }
-              }}
               className="grid md:grid-cols-3 gap-12"
             >
               {[
@@ -1066,30 +1079,26 @@ function Home({
               ].map((item, idx) => (
                 <motion.div 
                   key={idx}
-                  variants={{
-                    hidden: { opacity: 0, y: 30 },
-                    visible: { opacity: 1, y: 0 }
-                  }}
-                  whileHover={{ y: -5, boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.5)" }}
-                  className={`flex flex-col items-center text-center p-8 rounded-xl border transition-all ${
-                    isDarkMode ? 'bg-[#1A1A1A] border-[#D4AF37]/10' : 'bg-white border-[#701524]/10 shadow-xl'
+                  whileHover={{ y: -5 }}
+                  className={`flex flex-col items-center text-center p-8 rounded-xl border-2 transition-all ${
+                    isDarkMode ? 'bg-[#1A1A1A] border-[#D4AF37]/30 shadow-[0_0_20px_rgba(212,175,55,0.1)]' : 'bg-white border-[#701524]/20 shadow-xl'
                   }`}
                 >
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-6 shadow-lg border ${
-                    isDarkMode ? 'bg-[#1A1A1A] text-[#D4AF37] border-[#D4AF37]/20' : 'bg-[#701524] text-white border-transparent'
+                  <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-6 shadow-lg border-2 ${
+                    isDarkMode ? 'bg-[#1A1A1A] text-[#D4AF37] border-[#D4AF37]/50' : 'bg-[#701524] text-[#D4AF37] border-transparent'
                   }`}>
                     {item.icon}
                   </div>
-                  <h3 className={`text-xl font-bold mb-4 font-serif ${isDarkMode ? 'text-white' : 'text-[#701524]'}`}>{item.title}</h3>
-                  <p className={isDarkMode ? 'text-[#A0A0A0]' : 'text-gray-600'}>{item.content}</p>
+                  <h3 className={`text-xl font-bold mb-4 font-display ${isDarkMode ? 'text-white' : 'text-[#701524]'}`}>{item.title}</h3>
+                  <p className={isDarkMode ? 'text-[#A0A0A0]' : 'text-gray-600 font-serif'}>{item.content}</p>
                   {item.link && (
                     <a href={item.link} target="_blank" className={`mt-4 font-bold text-sm flex items-center gap-1 hover:underline ${isDarkMode ? 'text-[#D4AF37]' : 'text-[#701524]'}`}>
                       {item.linkText} <ExternalLink size={14} />
                     </a>
                   )}
                   {item.badge && (
-                    <span className={`mt-4 font-bold text-xs px-3 py-1 rounded-full border ${
-                      isDarkMode ? 'text-[#D4AF37] bg-[#1A1A1A] border-[#D4AF37]/20' : 'text-white bg-[#701524] border-transparent'
+                    <span className={`mt-4 font-bold text-xs px-3 py-1 rounded-full border-2 ${
+                      isDarkMode ? 'text-[#D4AF37] bg-[#1A1A1A] border-[#D4AF37]/50' : 'text-white bg-[#701524] border-transparent'
                     }`}>
                       {item.badge}
                     </span>
@@ -1101,19 +1110,24 @@ function Home({
         </section>
 
         {/* Brand Quality Parallax Section */}
+        <div className="h-24 w-full bg-tatreez-olive opacity-80 border-y-4 border-[#D4AF37]/60 shadow-[0_0_30px_rgba(212,175,55,0.2)]" />
         <QualitySection isDarkMode={isDarkMode} />
+        <div className="h-24 w-full bg-tatreez-olive opacity-80 border-y-4 border-[#D4AF37]/60 shadow-[0_0_30px_rgba(212,175,55,0.2)]" />
 
         {/* Menu Section */}
         <section id="menu" className={`py-20 md:py-32 transition-colors duration-500 ${isDarkMode ? 'bg-[#0A0A0A]' : 'bg-[#FDFCF0]'}`}>
           <div className="max-w-7xl mx-auto px-6">
+            <div className="flex justify-center mb-12">
+               <div className="h-16 w-32 bg-tatreez-olive bg-no-repeat bg-center opacity-40" />
+            </div>
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-12 md:mb-16"
             >
-              <span className="text-[#D4AF37] font-bold text-sm tracking-[0.3em] uppercase mb-4 block">Visual Experience</span>
-              <h2 className={`text-4xl sm:text-5xl md:text-7xl font-serif font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-[#701524]'}`}>Explore Our Menu</h2>
+              <span className="text-[#D4AF37] font-bold text-sm tracking-[0.3em] uppercase mb-4 block text-glow-gold">Visual Experience</span>
+              <h2 className={`text-4xl sm:text-5xl md:text-7xl font-display font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-[#701524]'}`}>Explore Our Menu</h2>
               <p className={`text-lg max-w-2xl mx-auto mb-10 font-light ${isDarkMode ? 'text-white/40' : 'text-gray-600'}`}>
                 See the authentic dishes we prepare with love and tradition.
               </p>
@@ -1330,7 +1344,7 @@ function Home({
                   className="order-1 lg:order-2"
                 >
                 <div className="mb-8 md:mb-12">
-                  <h2 className={`text-4xl sm:text-5xl md:text-6xl font-serif font-bold mb-6 ${isDarkMode ? 'text-[#D4AF37]' : 'text-[#701524]'}`}>Book a Table</h2>
+                  <h2 className={`text-4xl sm:text-5xl md:text-6xl font-display font-bold mb-6 ${isDarkMode ? 'text-[#D4AF37]' : 'text-[#701524]'}`}>Book a Table</h2>
                   <p className={`text-base md:text-lg leading-relaxed ${isDarkMode ? 'text-[#A0A0A0]' : 'text-gray-600'}`}>
                     Join us for an unforgettable dining experience. Whether it's a family gathering or an intimate dinner, we'll make sure you feel at home.
                   </p>
@@ -1382,8 +1396,8 @@ function Home({
                               placeholder="John Doe"
                               value={formData.fullName}
                               onChange={(e) => setFormData({...formData, fullName: e.target.value})}
-                              className={`w-full px-5 py-4 border rounded outline-none transition-all placeholder:text-white/20 ${
-                                isDarkMode ? 'bg-[#0A0A0A] border-[#D4AF37]/20 text-white focus:border-[#D4AF37]' : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524]'
+                              className={`w-full px-5 py-4 border rounded outline-none transition-all ${
+                                isDarkMode ? 'bg-[#0A0A0A] border-[#D4AF37]/20 text-white focus:border-[#D4AF37] placeholder:text-white/40' : 'bg-white border-gray-300 text-[#1A1A1A] focus:border-[#701524] placeholder:text-gray-400'
                               }`}
                             />
                           </div>
@@ -1395,8 +1409,8 @@ function Home({
                               placeholder="(973) 555-0123"
                               value={formData.phone}
                               onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                              className={`w-full px-5 py-4 border rounded outline-none transition-all placeholder:text-white/20 ${
-                                isDarkMode ? 'bg-[#0A0A0A] border-[#D4AF37]/20 text-white focus:border-[#D4AF37]' : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524]'
+                              className={`w-full px-5 py-4 border rounded outline-none transition-all ${
+                                isDarkMode ? 'bg-[#0A0A0A] border-[#D4AF37]/20 text-white focus:border-[#D4AF37] placeholder:text-white/40' : 'bg-white border-gray-300 text-[#1A1A1A] focus:border-[#701524] placeholder:text-gray-400'
                               }`}
                             />
                           </div>
@@ -1409,7 +1423,7 @@ function Home({
                               value={formData.guests}
                               onChange={(e) => setFormData({...formData, guests: e.target.value})}
                               className={`w-full px-5 py-4 border rounded outline-none transition-all appearance-none ${
-                                isDarkMode ? 'bg-[#0A0A0A] border-[#D4AF37]/20 text-white focus:border-[#D4AF37]' : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524]'
+                                isDarkMode ? 'bg-[#0A0A0A] border-[#D4AF37]/20 text-white focus:border-[#D4AF37]' : 'bg-white border-gray-300 text-[#1A1A1A] focus:border-[#701524]'
                               }`}
                             >
                               <option>1 Person</option>
@@ -1430,7 +1444,7 @@ function Home({
                               className={`w-full px-5 py-4 border rounded outline-none transition-all ${
                                 isDarkMode 
                                   ? 'bg-[#0A0A0A] border-[#D4AF37]/20 text-white focus:border-[#D4AF37] [color-scheme:dark]' 
-                                  : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524] [color-scheme:light]'
+                                  : 'bg-white border-gray-300 text-[#1A1A1A] focus:border-[#701524] [color-scheme:light]'
                               }`}
                             />
                           </div>
@@ -1440,7 +1454,7 @@ function Home({
                               value={formData.smoking}
                               onChange={(e) => setFormData({...formData, smoking: e.target.value})}
                               className={`w-full px-5 py-4 border rounded outline-none transition-all appearance-none ${
-                                isDarkMode ? 'bg-[#0A0A0A] border-[#D4AF37]/20 text-white focus:border-[#D4AF37]' : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524]'
+                                isDarkMode ? 'bg-[#0A0A0A] border-[#D4AF37]/20 text-white focus:border-[#D4AF37]' : 'bg-white border-gray-300 text-[#1A1A1A] focus:border-[#701524]'
                               }`}
                             >
                               <option>Non-Smoking</option>
@@ -1455,7 +1469,7 @@ function Home({
                             value={formData.time}
                             onChange={(e) => setFormData({...formData, time: e.target.value})}
                             className={`w-full px-5 py-4 border rounded outline-none transition-all appearance-none ${
-                              isDarkMode ? 'bg-[#0A0A0A] border-[#D4AF37]/20 text-white focus:border-[#D4AF37]' : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524]'
+                              isDarkMode ? 'bg-[#0A0A0A] border-[#D4AF37]/20 text-white focus:border-[#D4AF37]' : 'bg-white border-gray-300 text-[#1A1A1A] focus:border-[#701524]'
                             }`}
                           >
                             {Array.from({ length: 25 }).map((_, i) => {
@@ -1476,8 +1490,8 @@ function Home({
                             placeholder="Any allergies or special occasions?"
                             value={formData.requests}
                             onChange={(e) => setFormData({...formData, requests: e.target.value})}
-                            className={`w-full px-5 py-4 border rounded outline-none transition-all resize-none placeholder:text-white/20 ${
-                              isDarkMode ? 'bg-[#0A0A0A] border-[#D4AF37]/20 text-white focus:border-[#D4AF37]' : 'bg-gray-50 border-gray-200 text-[#1A1A1A] focus:border-[#701524]'
+                            className={`w-full px-5 py-4 border rounded outline-none transition-all resize-none ${
+                              isDarkMode ? 'bg-[#0A0A0A] border-[#D4AF37]/20 text-white focus:border-[#D4AF37] placeholder:text-white/40' : 'bg-white border-gray-300 text-[#1A1A1A] focus:border-[#701524] placeholder:text-gray-400'
                             }`}
                           />
                         </div>
@@ -1514,11 +1528,13 @@ function Home({
           </div>
         </section>
 
-        {/* Social Media Feed Section */}
         <section className={`py-20 md:py-32 transition-colors duration-500 ${isDarkMode ? 'bg-[#0A0A0A]' : 'bg-white'}`}>
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center mb-12 md:mb-20">
-              <h2 className={`text-4xl md:text-5xl font-serif font-bold mb-6 ${isDarkMode ? 'text-[#D4AF37]' : 'text-[#701524]'}`}>Stay Connected</h2>
+              <div className="flex justify-center mb-8">
+                 <img src="/images/tatreez_birds_motif.jpg" alt="" className="w-32 h-32 object-contain" />
+              </div>
+              <h2 className={`text-4xl md:text-5xl font-display font-bold mb-6 ${isDarkMode ? 'text-[#D4AF37]' : 'text-[#701524]'}`}>Stay Connected</h2>
               <p className={`text-base md:text-lg max-w-2xl mx-auto mb-10 ${isDarkMode ? 'text-[#A0A0A0]' : 'text-gray-600'}`}>
                 Follow our journey, see our latest creations, and join the Maklouba House family on social media.
               </p>
@@ -1543,7 +1559,7 @@ function Home({
               </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-2 bg-[#D4AF37]/10 rounded-2xl border-2 border-[#D4AF37]/30">
               {[
                 "/images/77dff7e9-7a0a-408e-8e7d-7270d3da7d5f.jpg",
                 "/images/679071e1-c5ab-49e3-a4ab-5b1003282df2.jpg",
@@ -1561,13 +1577,12 @@ function Home({
           </div>
         </section>
 
-        {/* Testimonials Section */}
         <section id="testimonials" className={`py-32 overflow-hidden transition-colors duration-500 ${isDarkMode ? 'bg-[#121212]' : 'bg-[#FDFCF0]'}`}>
           <div className="max-w-7xl mx-auto px-6">
             <div className="grid lg:grid-cols-3 gap-20">
               <div className="lg:col-span-2">
                 <div className="mb-16">
-                  <h2 className={`text-5xl font-serif font-bold mb-6 ${isDarkMode ? 'text-[#D4AF37]' : 'text-[#701524]'}`}>What Our Guests Say</h2>
+                  <h2 className={`text-5xl font-display font-bold mb-6 text-glow-gold ${isDarkMode ? 'text-[#D4AF37]' : 'text-[#701524]'}`}>What Our Guests Say</h2>
                   <p className={`text-lg max-w-xl ${isDarkMode ? 'text-[#A0A0A0]' : 'text-gray-600'}`}>
                     Discover why food lovers from all over New Jersey come to Maklouba House for an authentic taste of Palestine.
                   </p>
