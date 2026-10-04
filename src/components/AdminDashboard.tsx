@@ -40,7 +40,8 @@ import {
   Save,
   ChevronRight,
   BarChart3,
-  TrendingUp
+  TrendingUp,
+  Printer
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { menu as initialMenu } from '../data/menu';
@@ -278,6 +279,69 @@ export default function AdminDashboard() {
     setItemToDelete(id);
   };
 
+  const handlePrint = (order: any) => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    const itemsHtml = order.items?.map((item: any) => `
+      <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px;">
+        <span>${item.quantity}x ${item.name}</span>
+        <span>$${(parseFloat(item.price) * item.quantity).toFixed(2)}</span>
+      </div>
+    `).join('');
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Order Receipt - ${order.fullName}</title>
+          <style>
+            body { font-family: 'Courier New', Courier, monospace; padding: 20px; width: 300px; margin: 0 auto; color: #000; }
+            .header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 20px; }
+            .section { margin-bottom: 15px; border-bottom: 1px dashed #000; padding-bottom: 10px; }
+            .total { font-size: 18px; font-weight: bold; display: flex; justify-content: space-between; margin-top: 10px; }
+            .footer { text-align: center; font-size: 12px; margin-top: 20px; }
+            @media print { body { width: 100%; padding: 0; } }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h2 style="margin: 0;">MAKLOUBA HOUSE</h2>
+            <p style="margin: 5px 0;">1068 Main St, Paterson, NJ</p>
+            <p style="margin: 5px 0;">(973) 321-8611</p>
+          </div>
+          <div class="section">
+            <p><strong>Order ID:</strong> ${order.id.slice(-6).toUpperCase()}</p>
+            <p><strong>Customer:</strong> ${order.fullName}</p>
+            <p><strong>Phone:</strong> ${order.phone}</p>
+            <p><strong>Type:</strong> ${order.pickupTime} Pickup</p>
+            <p><strong>Date:</strong> ${new Date(order.createdAt?.seconds * 1000).toLocaleString()}</p>
+          </div>
+          <div class="section">
+            <strong>ITEMS:</strong>
+            <div style="margin-top: 10px;">${itemsHtml}</div>
+          </div>
+          <div class="section">
+            <div class="total">
+              <span>TOTAL</span>
+              <span>$${order.total?.toFixed(2)}</span>
+            </div>
+          </div>
+          ${order.notes ? `<div class="section"><strong>NOTES:</strong><br/>${order.notes}</div>` : ''}
+          <div class="footer">
+            <p>Shukran for ordering from Maklouba House!</p>
+          </div>
+          <script>
+            window.onload = () => {
+              window.print();
+              setTimeout(() => window.close(), 500);
+            }
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
   if (loading) return <div className="h-screen flex items-center justify-center bg-[#701524] text-white">Loading...</div>;
 
   if (!user) {
@@ -475,6 +539,12 @@ export default function AdminDashboard() {
                       </button>
                     )}
                     <button 
+                      onClick={() => handlePrint(order)}
+                      className="flex-1 md:flex-none px-4 md:px-6 py-3 bg-[#D4AF37] text-[#1A1A1A] font-bold rounded-xl flex items-center justify-center gap-2 text-sm hover:bg-white transition-all"
+                    >
+                      <Printer size={16} /> Print Receipt
+                    </button>
+                    <button 
                       onClick={() => deleteDoc(doc(db, 'orders', order.id))}
                       className="flex-1 md:flex-none px-4 md:px-6 py-3 bg-red-50 text-red-500 font-bold rounded-xl hover:bg-red-500 hover:text-white transition-all text-sm"
                     >
@@ -645,6 +715,42 @@ export default function AdminDashboard() {
                             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm"
                           />
                         </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Min. Pickup Time</label>
+                          <select 
+                            value={newItem.minPickupTime}
+                            onChange={e => setNewItem({...newItem, minPickupTime: e.target.value})}
+                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm"
+                          >
+                            <option value="15 min">15 Minutes</option>
+                            <option value="30 min">30 Minutes</option>
+                            <option value="1 hr">1 Hour</option>
+                            <option value="2 hr">2 Hours</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Image Upload</label>
+                          <div className="flex flex-col gap-3">
+                            <input 
+                              type="file" 
+                              accept="image/*"
+                              onChange={handleFileChange}
+                              className="w-full text-[10px] text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-[#701524]/10 file:text-[#701524] hover:file:bg-[#701524]/20"
+                            />
+                            {newItem.imageUrl && (
+                              <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200 group">
+                                <img src={newItem.imageUrl} className="w-full h-full object-cover" />
+                                <button 
+                                  type="button"
+                                  onClick={() => setNewItem({ ...newItem, imageUrl: '' })}
+                                  className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity"
+                                >
+                                  <XCircle size={16} />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
                       <div className="space-y-4">
                         <div>
@@ -674,10 +780,21 @@ export default function AdminDashboard() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                     {menuItems.filter(m => m.category === cat).map(item => (
                       <div key={`item-${item.id}`} className={`p-4 bg-white rounded-xl shadow-sm border ${item.available ? 'border-gray-100' : 'border-red-200 opacity-60'}`}>
+                        {item.imageUrl && (
+                          <div className="aspect-video w-full rounded-lg overflow-hidden mb-3 relative group">
+                            <img src={item.imageUrl} className="w-full h-full object-cover" />
+                          </div>
+                        )}
                         <div className="flex justify-between items-start mb-2">
-                          <h3 className="font-bold text-sm">{item.name}</h3>
+                          <div>
+                            <h3 className="font-bold text-sm">{item.name}</h3>
+                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter flex items-center gap-1">
+                              <Clock size={10} /> Min: {item.minPickupTime || '15 min'}
+                            </span>
+                          </div>
                           <span className="font-mono text-[#701524] text-sm">${item.price}</span>
                         </div>
+                        <p className="text-[10px] text-gray-500 mb-4 line-clamp-1">{item.description}</p>
                         <div className="flex gap-2 mt-4">
                           <button 
                             onClick={() => toggleAvailability(item.id, item.available)}
