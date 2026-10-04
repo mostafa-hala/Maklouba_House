@@ -322,6 +322,15 @@ export default function App() {
   }, [user]);
 
   const addNotification = (message: string, type: 'order' | 'res') => {
+    // Play notification sound
+    try {
+      const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+      audio.volume = 0.5;
+      audio.play().catch(e => console.log('Audio play failed (waiting for user interaction):', e));
+    } catch (err) {
+      console.error('Audio error:', err);
+    }
+
     const id = Math.random().toString(36).substr(2, 9);
     setNotifications(prev => [...prev, { id, message, type }]);
     setTimeout(() => {
