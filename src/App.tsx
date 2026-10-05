@@ -198,7 +198,9 @@ export default function App() {
     }).filter(i => i.quantity > 0));
   };
 
-  const cartTotal = cart.reduce((acc: number, item: any) => acc + (parseFloat(item.price) * item.quantity), 0);
+  const cartSubtotal = cart.reduce((acc: number, item: any) => acc + (parseFloat(item.price) * item.quantity), 0);
+  const cartTax = cartSubtotal * 0.088;
+  const cartTotal = cartSubtotal + cartTax;
 
   const handleOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -210,6 +212,9 @@ export default function App() {
       await addDoc(collection(db, 'orders'), {
         items: cart,
         orderHistory: cart.map(item => item.name), // Flattened list for quick insight
+        subtotal: cartSubtotal,
+        taxRate: 0.088,
+        tax: cartTax,
         total: cartTotal,
         ...orderFormData,
         type: 'pickup',
@@ -516,10 +521,18 @@ export default function App() {
                       ))}
                     </div>
 
-                    <div className={`pt-6 border-t-2 ${isDarkMode ? 'border-white/10' : 'border-gray-100'}`}>
-                      <div className="flex justify-between items-center mb-10">
+                    <div className={`pt-6 border-t-2 ${isDarkMode ? 'border-white/10' : 'border-gray-100'} space-y-2`}>
+                      <div className="flex justify-between items-center text-sm">
+                        <span className={isDarkMode ? 'text-white/60' : 'text-gray-600'}>Subtotal</span>
+                        <span className={`font-mono ${isDarkMode ? 'text-white' : 'text-[#1A1A1A]'}`}>${cartSubtotal.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-sm">
+                        <span className={isDarkMode ? 'text-white/60' : 'text-gray-600'}>Tax (8.8%)</span>
+                        <span className={`font-mono ${isDarkMode ? 'text-white' : 'text-[#1A1A1A]'}`}>${cartTax.toFixed(2)}</span>
+                      </div>
+                      <div className={`flex justify-between items-center pt-3 border-t border-dashed ${isDarkMode ? 'border-white/15' : 'border-gray-200'} mb-8`}>
                         <span className={`text-xl font-serif font-bold ${isDarkMode ? 'text-[#D4AF37]' : 'text-[#701524]'}`}>Total Amount</span>
-                        <span className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-[#1A1A1A]'}`}>${cartTotal.toFixed(2)}</span>
+                        <span className={`text-2xl font-bold font-mono ${isDarkMode ? 'text-white' : 'text-[#1A1A1A]'}`}>${cartTotal.toFixed(2)}</span>
                       </div>
 
                       <form onSubmit={handleOrder} className="space-y-4">
