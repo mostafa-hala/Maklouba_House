@@ -290,6 +290,20 @@ export default function AdminDashboard() {
       </div>
     `).join('');
 
+    const subtotal = order.subtotal !== undefined
+      ? Number(order.subtotal)
+      : (order.items && order.items.length > 0
+          ? order.items.reduce((acc: number, item: any) => acc + (parseFloat(item.price) * (item.quantity || 1)), 0)
+          : (Number(order.total) || 0));
+
+    const tax = order.tax !== undefined
+      ? Number(order.tax)
+      : (subtotal * 0.088);
+
+    const total = order.total !== undefined && order.subtotal !== undefined
+      ? Number(order.total)
+      : (subtotal + tax);
+
     printWindow.document.write(`
       <html>
         <head>
@@ -298,7 +312,8 @@ export default function AdminDashboard() {
             body { font-family: 'Courier New', Courier, monospace; padding: 20px; width: 300px; margin: 0 auto; color: #000; }
             .header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 20px; }
             .section { margin-bottom: 15px; border-bottom: 1px dashed #000; padding-bottom: 10px; }
-            .total { font-size: 18px; font-weight: bold; display: flex; justify-content: space-between; margin-top: 10px; }
+            .row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; }
+            .total { font-size: 18px; font-weight: bold; display: flex; justify-content: space-between; margin-top: 10px; border-top: 1px dashed #000; padding-top: 8px; }
             .footer { text-align: center; font-size: 12px; margin-top: 20px; }
             @media print { body { width: 100%; padding: 0; } }
           </style>
@@ -310,20 +325,28 @@ export default function AdminDashboard() {
             <p style="margin: 5px 0;">(973) 321-8611</p>
           </div>
           <div class="section">
-            <p><strong>Order ID:</strong> ${order.id.slice(-6).toUpperCase()}</p>
-            <p><strong>Customer:</strong> ${order.fullName}</p>
-            <p><strong>Phone:</strong> ${order.phone}</p>
-            <p><strong>Type:</strong> ${order.pickupTime} Pickup</p>
-            <p><strong>Date:</strong> ${new Date(order.createdAt?.seconds * 1000).toLocaleString()}</p>
+            <p style="margin: 4px 0;"><strong>Order ID:</strong> ${order.id.slice(-6).toUpperCase()}</p>
+            <p style="margin: 4px 0;"><strong>Customer:</strong> ${order.fullName}</p>
+            <p style="margin: 4px 0;"><strong>Phone:</strong> ${order.phone}</p>
+            <p style="margin: 4px 0;"><strong>Type:</strong> ${order.pickupTime} Pickup</p>
+            <p style="margin: 4px 0;"><strong>Date:</strong> ${order.createdAt?.seconds ? new Date(order.createdAt.seconds * 1000).toLocaleString() : new Date().toLocaleString()}</p>
           </div>
           <div class="section">
             <strong>ITEMS:</strong>
             <div style="margin-top: 10px;">${itemsHtml}</div>
           </div>
           <div class="section">
+            <div class="row">
+              <span>Subtotal</span>
+              <span>$${subtotal.toFixed(2)}</span>
+            </div>
+            <div class="row">
+              <span>Tax (8.8%)</span>
+              <span>$${tax.toFixed(2)}</span>
+            </div>
             <div class="total">
               <span>TOTAL</span>
-              <span>$${order.total?.toFixed(2)}</span>
+              <span>$${total.toFixed(2)}</span>
             </div>
           </div>
           ${order.notes ? `<div class="section"><strong>NOTES:</strong><br/>${order.notes}</div>` : ''}
@@ -516,8 +539,17 @@ export default function AdminDashboard() {
                       <p className="text-sm text-gray-500">{order.phone}</p>
                     </div>
                     <div className="sm:text-right w-full sm:w-auto">
-                      <p className="text-lg font-bold text-[#701524]">${order.total?.toFixed(2)}</p>
-                      <p className="text-[10px] text-gray-400">{new Date(order.createdAt?.seconds * 1000).toLocaleString()}</p>
+                      <p className="text-lg font-bold text-[#701524]">
+                        ${(order.total !== undefined ? Number(order.total) : (order.subtotal ? Number(order.subtotal) * 1.088 : 0)).toFixed(2)}
+                      </p>
+                      <p className="text-[10px] text-gray-500 font-medium">
+                        {order.tax !== undefined 
+                          ? `Incl. $${Number(order.tax).toFixed(2)} tax (8.8%)`
+                          : (order.subtotal ? `Sub: $${Number(order.subtotal).toFixed(2)} + 8.8% tax` : `Incl. 8.8% tax`)}
+                      </p>
+                      <p className="text-[10px] text-gray-400">
+                        {order.createdAt?.seconds ? new Date(order.createdAt.seconds * 1000).toLocaleString() : ''}
+                      </p>
                     </div>
                   </div>
                   <div className="space-y-2 mb-6 border-y border-gray-50 py-4">
