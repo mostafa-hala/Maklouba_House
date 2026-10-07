@@ -41,10 +41,14 @@ import {
   ChevronRight,
   BarChart3,
   TrendingUp,
-  Printer
+  Printer,
+  BellRing,
+  Volume2,
+  Bell
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { menu as initialMenu } from '../data/menu';
+import { alarmSound } from '../utils/alarm';
 
 export default function AdminDashboard() {
   const [user, setUser] = useState<any>(null);
@@ -279,6 +283,24 @@ export default function AdminDashboard() {
     setItemToDelete(id);
   };
 
+  const confirmOrder = async (orderId: string) => {
+    try {
+      await updateDoc(doc(db, 'orders', orderId), { acknowledged: true });
+      alarmSound.stop();
+    } catch (err) {
+      console.error("Error confirming order:", err);
+    }
+  };
+
+  const confirmReservation = async (resId: string) => {
+    try {
+      await updateDoc(doc(db, 'reservations', resId), { acknowledged: true });
+      alarmSound.stop();
+    } catch (err) {
+      console.error("Error confirming reservation:", err);
+    }
+  };
+
   const handlePrint = (order: any) => {
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
@@ -500,25 +522,34 @@ export default function AdminDashboard() {
             <h1 className="text-2xl md:text-3xl font-display font-bold text-[#701524] capitalize">{activeTab}</h1>
             <p className="text-sm md:text-base text-gray-500">Real-time management for Maklouba House</p>
           </div>
-          {activeTab === 'menu' && (
-            <div className="flex flex-wrap gap-2 md:gap-4 w-full md:w-auto">
-              {menuItems.length === 0 && (
-                <button onClick={seedMenu} className="flex-1 md:flex-none px-4 py-2 bg-white text-[#701524] border border-[#701524] font-bold rounded shadow-sm hover:bg-gray-50 transition-all text-xs md:text-sm">
-                  Seed Menu
+          <div className="flex flex-wrap items-center gap-2 md:gap-4 w-full md:w-auto">
+            <button 
+              onClick={() => alarmSound.test()}
+              className="px-3.5 py-2 bg-white text-[#701524] border border-[#701524]/20 hover:bg-[#701524] hover:text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
+              title="Test the kitchen voice alarm chime"
+            >
+              <Volume2 size={16} className="text-[#D4AF37]" /> Test Voice Alarm
+            </button>
+            {activeTab === 'menu' && (
+              <>
+                {menuItems.length === 0 && (
+                  <button onClick={seedMenu} className="flex-1 md:flex-none px-4 py-2 bg-white text-[#701524] border border-[#701524] font-bold rounded shadow-sm hover:bg-gray-50 transition-all text-xs md:text-sm">
+                    Seed Menu
+                  </button>
+                )}
+                <button 
+                  onClick={() => {
+                    setEditingId(null);
+                    setNewItem({ name: '', category: '', customCategory: '', price: '', description: '', imageUrl: '', minPickupTime: '15 min' });
+                    setShowAddItem(true);
+                  }}
+                  className="flex-1 md:flex-none px-4 py-2 bg-[#D4AF37] text-[#701524] font-bold rounded shadow-lg flex items-center justify-center gap-2 hover:bg-[#b8982f] transition-all text-xs md:text-sm"
+                >
+                  <Plus size={18} /> Add Item
                 </button>
-              )}
-              <button 
-                onClick={() => {
-                  setEditingId(null);
-                  setNewItem({ name: '', category: '', customCategory: '', price: '', description: '', imageUrl: '', minPickupTime: '15 min' });
-                  setShowAddItem(true);
-                }}
-                className="flex-1 md:flex-none px-4 py-2 bg-[#D4AF37] text-[#701524] font-bold rounded shadow-lg flex items-center justify-center gap-2 hover:bg-[#b8982f] transition-all text-xs md:text-sm"
-              >
-                <Plus size={18} /> Add Item
-              </button>
-            </div>
-          )}
+              </>
+            )}
+          </div>
         </header>
 
         <AnimatePresence mode="wait">
@@ -531,7 +562,22 @@ export default function AdminDashboard() {
                 </div>
               )}
               {orders.map(order => (
-                <div key={order.id} className={`p-4 md:p-6 rounded-2xl bg-white shadow-sm border-l-4 md:border-l-8 ${order.completed ? 'border-gray-200' : 'border-[#D4AF37]'}`}>
+                <div key={order.id} className={`p-4 md:p-6 rounded-2xl bg-white shadow-sm border-l-4 md:border-l-8 transition-all ${order.completed ? 'border-gray-200' : (!order.acknowledged ? 'border-red-500 ring-2 ring-red-500/30' : 'border-[#D4AF37]')}`}>
+                  {!order.acknowledged && !order.completed && (
+                    <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 text-red-800 font-bold text-xs">
+                        <BellRing size={16} className="text-red-600 animate-bounce shrink-0" />
+                        <span>NEW ORDER — AWAITING STAFF CONFIRMATION (ALARM RINGING)</span>
+                      </div>
+                      <button 
+                        onClick={() => confirmOrder(order.id)}
+                        className="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-lg transition-all shadow flex items-center justify-center gap-1.5 active:scale-95"
+                      >
+                        <CheckCircle2 size={14} /> Confirm & Silence
+                      </button>
+                    </div>
+                  )}
+
                   <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
                     <div>
                       <span className="text-[10px] font-bold text-[#D4AF37] uppercase tracking-widest">{order.pickupTime} Pickup</span>
@@ -561,11 +607,27 @@ export default function AdminDashboard() {
                     ))}
                   </div>
                   {order.notes && <div className="p-3 bg-gray-50 rounded italic text-xs mb-6 border border-gray-100">"{order.notes}"</div>}
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {!order.acknowledged && !order.completed ? (
+                      <button 
+                        onClick={() => confirmOrder(order.id)}
+                        className="flex-1 md:flex-none px-5 py-3 bg-[#D4AF37] text-[#1A1A1A] font-bold rounded-xl flex items-center justify-center gap-2 text-sm shadow-md hover:bg-white transition-all ring-2 ring-[#D4AF37]/50 active:scale-95"
+                      >
+                        <CheckCircle2 size={16} /> Confirm Order (Stop Alarm)
+                      </button>
+                    ) : !order.completed ? (
+                      <span className="px-3.5 py-2.5 bg-green-50 text-green-700 text-xs font-bold rounded-xl border border-green-200 flex items-center gap-1.5">
+                        <CheckCircle2 size={15} /> Confirmed by Staff
+                      </span>
+                    ) : null}
+
                     {!order.completed && (
                       <button 
-                        onClick={() => updateDoc(doc(db, 'orders', order.id), { completed: true })}
-                        className="flex-1 md:flex-none px-4 md:px-6 py-3 bg-green-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 text-sm"
+                        onClick={async () => {
+                          await updateDoc(doc(db, 'orders', order.id), { completed: true, acknowledged: true });
+                          alarmSound.stop();
+                        }}
+                        className="flex-1 md:flex-none px-4 md:px-6 py-3 bg-green-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 text-sm hover:bg-green-600 transition-all"
                       >
                         <CheckCircle2 size={16} /> Complete
                       </button>
@@ -596,12 +658,13 @@ export default function AdminDashboard() {
                     <th className="p-4 md:p-6 text-sm">Guest</th>
                     <th className="p-4 md:p-6 text-sm">Details</th>
                     <th className="p-4 md:p-6 text-sm">Date/Time</th>
-                    <th className="p-4 md:p-6 text-sm">Actions</th>
+                    <th className="p-4 md:p-6 text-sm">Status</th>
+                    <th className="p-4 md:p-6 text-sm text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {reservations.map(res => (
-                    <tr key={res.id} className="hover:bg-gray-50 transition-all">
+                    <tr key={res.id} className={`hover:bg-gray-50 transition-all ${!res.acknowledged ? 'bg-red-50/50' : ''}`}>
                       <td className="p-4 md:p-6">
                         <p className="font-bold text-sm md:text-base">{res.fullName}</p>
                         <p className="text-xs text-gray-500">{res.phone}</p>
@@ -620,13 +683,36 @@ export default function AdminDashboard() {
                         <p className="font-bold text-xs md:text-sm">{res.date}</p>
                         <p className="text-[10px] text-gray-500">{res.time}</p>
                       </td>
+                      <td className="p-4 md:p-6">
+                        {!res.acknowledged ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-red-100 text-red-700 border border-red-200 text-[10px] font-bold rounded-full animate-pulse">
+                            <BellRing size={11} className="text-red-600" /> Unconfirmed
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 border border-green-200 text-[10px] font-bold rounded-full">
+                            <CheckCircle2 size={11} /> Confirmed
+                          </span>
+                        )}
+                      </td>
                       <td className="p-4 md:p-6 text-center">
-                        <button 
-                          onClick={() => deleteDoc(doc(db, 'reservations', res.id))}
-                          className="text-red-500 hover:text-red-700 p-2"
-                        >
-                          <Trash2 size={18} />
-                        </button>
+                        <div className="flex items-center justify-center gap-2">
+                          {!res.acknowledged && (
+                            <button 
+                              onClick={() => confirmReservation(res.id)}
+                              className="px-3 py-1.5 bg-[#D4AF37] text-[#1A1A1A] font-bold rounded-lg text-xs flex items-center gap-1.5 hover:bg-white transition-all shadow whitespace-nowrap active:scale-95"
+                              title="Confirm Booking & Silence Alarm"
+                            >
+                              <CheckCircle2 size={14} /> Confirm
+                            </button>
+                          )}
+                          <button 
+                            onClick={() => deleteDoc(doc(db, 'reservations', res.id))}
+                            className="text-red-500 hover:text-red-700 p-2"
+                            title="Delete"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
