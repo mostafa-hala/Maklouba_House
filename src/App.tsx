@@ -23,7 +23,11 @@ import {
   Star,
   XCircle,
   Sun,
-  Moon
+  Moon,
+  BellRing,
+  Bell,
+  BellOff,
+  Volume2
 } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react';
 import { menu } from './data/menu';
@@ -37,12 +41,15 @@ import {
   orderBy, 
   onSnapshot, 
   limit,
-  getDocs 
+  getDocs,
+  doc,
+  updateDoc
 } from 'firebase/firestore';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import AdminDashboard from './components/AdminDashboard';
 import OrderPage from './pages/OrderPage';
 import MenuPage from './pages/MenuPage';
+import { alarmSound } from './utils/alarm';
 
 const COLORS = {
   primary: '#1A1A1A', // Dark Charcoal
@@ -53,11 +60,20 @@ const COLORS = {
   cultural: '#701524', // Palestinian Red
 };
 
+export interface StaffAlert {
+  id: string;
+  docId: string;
+  type: 'order' | 'res';
+  title: string;
+  message: string;
+  createdAt?: any;
+}
+
 export default function App() {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith('/admin');
   const [user, setUser] = useState<any>(null);
-  const [notifications, setNotifications] = useState<{id: string, message: string, type: 'order' | 'res'}[]>([]);
+  const [activeAlarms, setActiveAlarms] = useState<StaffAlert[]>([]);
 
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -218,6 +234,8 @@ export default function App() {
         total: cartTotal,
         ...orderFormData,
         type: 'pickup',
+        acknowledged: false,
+        completed: false,
         createdAt: serverTimestamp()
       });
       setOrderComplete(true);
@@ -265,6 +283,7 @@ export default function App() {
     try {
       await addDoc(collection(db, 'reservations'), {
         ...formData,
+        acknowledged: false,
         createdAt: serverTimestamp()
       });
       setIsSubmitted(true);
@@ -292,30 +311,95 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
+  // Sync continuous alarm audio with active unconfirmed alarms
   useEffect(() => {
-    if (!user) return;
+    if (activeAlarms.length > 0) {
+      alarmSound.start();
+    } else {
+      alarmSound.stop();
+    }
+  }, [activeAlarms.length]);
 
-    // Real-time notification listeners for Staff
-    const unsubOrders = onSnapshot(query(collection(db, 'orders'), orderBy('createdAt', 'desc'), limit(10)), (s) => {
+  // Unlock browser audio context on first user interaction
+  useEffect(() => {
+    const handleUnlock = () => {
+      alarmSound.unlock();
+    };
+    window.addEventListener('click', handleUnlock, { passive: true });
+    window.addEventListener('touchstart', handleUnlock, { passive: true });
+    return () => {
+      alarmSound.stop();
+      window.removeEventListener('click', handleUnlock);
+      window.removeEventListener('touchstart', handleUnlock);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!user || !isAdminPath) {
+      setActiveAlarms([]);
+      alarmSound.stop();
+      return;
+    }
+
+    // Real-time notification & persistent alarm listeners for Staff
+    // Restricted to when staff is actively viewing the admin panel
+    const unsubOrders = onSnapshot(query(collection(db, 'orders'), orderBy('createdAt', 'desc'), limit(15)), (s) => {
       s.docChanges().forEach((change) => {
-        if (change.type === 'added' && !s.metadata.hasPendingWrites) {
-          const data = change.doc.data();
-          const isRecent = data.createdAt?.seconds > (Date.now() / 1000) - 30;
-          if (isRecent) {
-            addNotification(`New Order from ${data.fullName}`, 'order');
+        const data = change.doc.data();
+        const alertId = `order-${change.doc.id}`;
+
+        if (change.type === 'added') {
+          // If created within the last 45 minutes or brand new, and not yet confirmed or completed
+          const isRecent = !data.createdAt || (data.createdAt?.seconds > (Date.now() / 1000) - (45 * 60));
+          if (isRecent && !data.acknowledged && !data.completed) {
+            setActiveAlarms(prev => {
+              if (prev.some(a => a.id === alertId)) return prev;
+              return [...prev, {
+                id: alertId,
+                docId: change.doc.id,
+                type: 'order',
+                title: 'New Order Received',
+                message: `Order from ${data.fullName} ($${(data.total || 0).toFixed(2)})`,
+                createdAt: data.createdAt
+              }];
+            });
           }
+        } else if (change.type === 'modified') {
+          if (data.acknowledged || data.completed) {
+            setActiveAlarms(prev => prev.filter(a => a.id !== alertId));
+          }
+        } else if (change.type === 'removed') {
+          setActiveAlarms(prev => prev.filter(a => a.id !== alertId));
         }
       });
     });
 
-    const unsubRes = onSnapshot(query(collection(db, 'reservations'), orderBy('createdAt', 'desc'), limit(10)), (s) => {
+    const unsubRes = onSnapshot(query(collection(db, 'reservations'), orderBy('createdAt', 'desc'), limit(15)), (s) => {
       s.docChanges().forEach((change) => {
-        if (change.type === 'added' && !s.metadata.hasPendingWrites) {
-          const data = change.doc.data();
-          const isRecent = data.createdAt?.seconds > (Date.now() / 1000) - 30 || !data.createdAt;
-          if (isRecent) {
-            addNotification(`New Reservation: ${data.fullName}`, 'res');
+        const data = change.doc.data();
+        const alertId = `res-${change.doc.id}`;
+
+        if (change.type === 'added') {
+          const isRecent = !data.createdAt || (data.createdAt?.seconds > (Date.now() / 1000) - (45 * 60));
+          if (isRecent && !data.acknowledged) {
+            setActiveAlarms(prev => {
+              if (prev.some(a => a.id === alertId)) return prev;
+              return [...prev, {
+                id: alertId,
+                docId: change.doc.id,
+                type: 'res',
+                title: 'New Table Booking',
+                message: `Table for ${data.fullName} (${data.guests || '2 People'})`,
+                createdAt: data.createdAt
+              }];
+            });
           }
+        } else if (change.type === 'modified') {
+          if (data.acknowledged) {
+            setActiveAlarms(prev => prev.filter(a => a.id !== alertId));
+          }
+        } else if (change.type === 'removed') {
+          setActiveAlarms(prev => prev.filter(a => a.id !== alertId));
         }
       });
     });
@@ -323,28 +407,95 @@ export default function App() {
     return () => {
       unsubOrders();
       unsubRes();
+      alarmSound.stop();
     };
-  }, [user]);
+  }, [user, isAdminPath]);
 
-  const addNotification = (message: string, type: 'order' | 'res') => {
-    // Play notification sound
+  const confirmAndSilenceAlarm = async (alert: StaffAlert) => {
+    setActiveAlarms(prev => {
+      const remaining = prev.filter(a => a.id !== alert.id);
+      if (remaining.length === 0) alarmSound.stop();
+      return remaining;
+    });
+
     try {
-      const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-      audio.volume = 0.5;
-      audio.play().catch(e => console.log('Audio play failed (waiting for user interaction):', e));
+      if (alert.type === 'order') {
+        await updateDoc(doc(db, 'orders', alert.docId), { acknowledged: true });
+      } else {
+        await updateDoc(doc(db, 'reservations', alert.docId), { acknowledged: true });
+      }
     } catch (err) {
-      console.error('Audio error:', err);
+      console.error("Error acknowledging alert:", err);
     }
+  };
 
-    const id = Math.random().toString(36).substr(2, 9);
-    setNotifications(prev => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setNotifications(prev => prev.filter(n => n.id !== id));
-    }, 8000);
+  const silenceAllActiveAlarms = async () => {
+    alarmSound.stop();
+    const current = [...activeAlarms];
+    setActiveAlarms([]);
+    for (const alert of current) {
+      try {
+        if (alert.type === 'order') {
+          await updateDoc(doc(db, 'orders', alert.docId), { acknowledged: true });
+        } else {
+          await updateDoc(doc(db, 'reservations', alert.docId), { acknowledged: true });
+        }
+      } catch (err) {
+        console.error("Error acknowledging alert:", err);
+      }
+    }
   };
 
   return (
     <>
+        {/* Persistent Continuous Alarm Banner for Staff */}
+        <AnimatePresence>
+          {isAdminPath && activeAlarms.length > 0 && (
+            <motion.div
+              initial={{ y: -80, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -80, opacity: 0 }}
+              className="fixed top-0 left-0 right-0 z-[10001] bg-gradient-to-r from-red-600 via-[#701524] to-red-600 text-white px-4 md:px-8 py-3 shadow-[0_4px_30px_rgba(220,38,38,0.6)] flex flex-col sm:flex-row items-center justify-between gap-3 border-b-2 border-[#D4AF37]"
+            >
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center animate-bounce shrink-0">
+                  <BellRing size={22} className="text-[#D4AF37]" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="bg-red-500 text-white text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full animate-pulse">
+                      Alarm Sounding
+                    </span>
+                    <p className="font-bold text-sm md:text-base leading-tight">
+                      {activeAlarms.length} New {activeAlarms.length === 1 ? 'Notification' : 'Notifications'} Awaiting Confirmation!
+                    </p>
+                  </div>
+                  <p className="text-xs text-white/90 mt-0.5">
+                    {activeAlarms[0].title}: {activeAlarms[0].message}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <button
+                  onClick={() => confirmAndSilenceAlarm(activeAlarms[0])}
+                  className="flex-1 sm:flex-none px-5 py-2.5 bg-[#D4AF37] hover:bg-white text-[#1A1A1A] font-bold text-xs md:text-sm rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95"
+                >
+                  <CheckCircle2 size={16} /> CONFIRM & STOP ALARM
+                </button>
+                {activeAlarms.length > 1 && (
+                  <button
+                    onClick={silenceAllActiveAlarms}
+                    className="px-3.5 py-2.5 bg-black/40 hover:bg-black/60 text-white font-bold text-xs rounded-xl transition-all"
+                  >
+                    Confirm All ({activeAlarms.length})
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Palestinian Tatreez Sidebar Decoration */}
         {!isAdminPath && (
           <>
@@ -357,31 +508,38 @@ export default function App() {
           </>
         )}
 
-      {/* Global Notifications for Staff */}
-      <div className="fixed top-6 right-6 z-[9999] flex flex-col gap-4 pointer-events-none">
+      {/* Global Floating Alarm Notifications for Staff */}
+      <div className={`fixed ${isAdminPath && activeAlarms.length > 0 ? 'top-20' : 'top-6'} right-6 z-[9999] flex flex-col gap-4 pointer-events-none transition-all duration-300`}>
         <AnimatePresence>
-          {notifications.map(n => (
+          {isAdminPath && activeAlarms.map(n => (
             <motion.div
               key={n.id}
               initial={{ opacity: 0, x: 50, scale: 0.9 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
-              className="pointer-events-auto bg-[#1A1A1A] text-white p-5 rounded-2xl shadow-2xl border-2 border-[#D4AF37] flex items-center gap-4 min-w-[300px]"
+              className="pointer-events-auto bg-[#1A1A1A] text-white p-5 rounded-2xl shadow-2xl border-2 border-red-500 flex flex-col gap-3 min-w-[320px] max-w-sm ring-4 ring-red-500/20"
             >
-              <div className="w-12 h-12 bg-[#D4AF37] rounded-full flex items-center justify-center text-[#1A1A1A]">
-                {n.type === 'order' ? <ShoppingBag size={24} /> : <Calendar size={24} />}
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center text-white shrink-0 animate-pulse">
+                  {n.type === 'order' ? <ShoppingBag size={22} /> : <Calendar size={22} />}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-bold uppercase text-[#D4AF37] tracking-wider">
+                      {n.type === 'order' ? 'Incoming Order' : 'Incoming Booking'}
+                    </p>
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+                  </div>
+                  <p className="font-bold text-sm leading-tight text-white">{n.title}</p>
+                  <p className="text-xs text-white/70 mt-0.5">{n.message}</p>
+                </div>
               </div>
-              <div className="flex-1">
-                <p className="text-xs font-bold uppercase text-[#D4AF37] mb-0.5">
-                  {n.type === 'order' ? 'New Order Received' : 'New Table Booking'}
-                </p>
-                <p className="font-bold">{n.message}</p>
-              </div>
+
               <button 
-                onClick={() => setNotifications(prev => prev.filter(item => item.id !== n.id))}
-                className="text-white/40 hover:text-white"
+                onClick={() => confirmAndSilenceAlarm(n)}
+                className="w-full py-2.5 bg-[#D4AF37] hover:bg-white text-[#1A1A1A] font-bold text-xs rounded-xl transition-all shadow flex items-center justify-center gap-2 active:scale-95"
               >
-                <XCircle size={20} />
+                <CheckCircle2 size={16} /> CONFIRM & STOP ALARM
               </button>
             </motion.div>
           ))}
